@@ -19,6 +19,9 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print("Received from topic " + msg.topic + " message: " + str(msg.payload))
 
+def on_subscribe(client, userdata, mid, granted_qos):
+    print(f"Granted QoS {granted_qos}")
+
 class Device:
     """
     This is the main class to simulate a sensor device.
@@ -44,6 +47,7 @@ class Device:
         self.client.on_message = on_message
 
         self.client.connect(broker_url, broker_port, keep_alive)
+        self.client.loop_start()
 
     def __repr__(self):
         return f"Device {self.id} to record measure: {self.measure}"
@@ -77,11 +81,9 @@ class Device:
         return rec
 
     def publish_recordings(self, n=1, sleep_s=1.0, topic="riccardo/pesce/test", retain=0, qos=0):
-        self.client.loop_start()
-        
         for i in range(n):
             self.client.publish(topic, json.dumps(self.simulate_recording()), retain=retain, qos=qos)
             time.sleep(sleep_s)
 
-    def subscribe(self):
-        pass
+    def subscribe(self, *topics_with_qos):
+        self.client.subscribe(topics_with_qos)
