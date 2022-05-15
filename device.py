@@ -1,6 +1,7 @@
 import json
 import uuid
 import random
+import time
 
 import numpy as np
 
@@ -75,6 +76,12 @@ class Device:
         
         return rec
 
-    def publish_recording(self, topic="riccardo/pesce/test", retain=0, qos=0):
+    def publish_recordings(self, n=1, sleep_s=1.0, topic="riccardo/pesce/test", retain=0, qos=0):
         self.client.loop_start()
-        self.client.publish(topic, json.dumps(self.simulate_recording()), retain=retain, qos=qos)
+        
+        for i in range(n):
+            self.client.publish(topic, json.dumps(self.simulate_recording()), retain=retain, qos=qos)
+            time.sleep(sleep_s)
+
+    def subscribe(self):
+        pass
