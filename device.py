@@ -41,6 +41,8 @@ class Device:
         self.n_outliers = 0
         self.n_errors = 0
 
+        self.publish_topic_string = f"riccardompesce/{self.uuid}/{self.measure}"
+
     def establish_connection(self, broker_url, broker_port, clean_session=0, keep_alive=60):
         self.client = mqtt.Client(clean_session=0, client_id=self.id)
         self.client.on_connect = on_connect
@@ -80,10 +82,9 @@ class Device:
         
         return rec
 
-    def publish_recordings(self, n=1, sleep_s=1.0, topic="riccardo/pesce/test", retain=0, qos=0):
+    def publish_recordings(self, n=1, retain=0, qos=0):
         for i in range(n):
-            self.client.publish(topic, json.dumps(self.simulate_recording()), retain=retain, qos=qos)
-            time.sleep(sleep_s)
+            self.client.publish(self.publish_topic_string, json.dumps(self.simulate_recording()), retain=retain, qos=qos)
 
     def subscribe(self, *topics_with_qos):
         self.client.subscribe(topics_with_qos)
