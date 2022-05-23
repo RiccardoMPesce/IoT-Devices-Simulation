@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 import uvicorn
 
-from device import Device
+from models.device import Device
 
 app = FastAPI()
 
