@@ -2,13 +2,15 @@ version: "1"
 
 services:
   db:
-    image: mongodb
+    image: mongo
     env_file:
       - .env
   app:
     build:
       dockerfile: Dockerfile
       context: .
+    volumes:
+      - ./app:/code/app
     image: riccardompesce/dsbd-mmms
     env_file:
       - .env

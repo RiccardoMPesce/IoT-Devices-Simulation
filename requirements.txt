@@ -1,0 +1,8 @@
+fastapi
+pydantic
+uvicorn
+numpy
+pandas
+scipy
+matplotlib
+paho-mqtt

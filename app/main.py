@@ -1,7 +1,14 @@
+from fastapi import FastAPI
+
+import uvicorn
+
 from device import Device
 
-def main():
-    pass 
+app = FastAPI()
+
+@app.get("/")
+def root_msg():
+    return {"status": "up"}
 
 if __name__ == "__main__":
-    main()
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
