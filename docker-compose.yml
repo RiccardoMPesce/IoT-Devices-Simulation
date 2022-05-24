@@ -10,7 +10,7 @@ services:
       dockerfile: Dockerfile
       context: .
     volumes:
-      - ./app:/code/app
+      - .:/code
     image: riccardompesce/dsbd-mmms
     env_file:
       - .env
