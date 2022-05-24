@@ -1,10 +1,9 @@
-from datetime import datetime
-
-from fastapi import FastAPI
 
 import uvicorn
 
-from models.device import Device
+from datetime import datetime
+
+from fastapi import FastAPI
 
 app = FastAPI()
 
