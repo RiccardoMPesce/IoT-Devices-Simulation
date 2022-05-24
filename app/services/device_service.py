@@ -1,4 +1,3 @@
-import imp
 from app.models.device import Device
 
 class DeviceService:
