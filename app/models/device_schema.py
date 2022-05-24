@@ -1,5 +1,5 @@
-from datetime import datetime
-from typing import Optional, Man
+from typing import Optional
+from numpy import double
 
 from pydantic import BaseModel, Field
 
@@ -9,6 +9,7 @@ class DeviceSchema(BaseModel):
     publish_qos: int = Field(..., ge=0, le=2)
     status: bool = Field(...)
     update_datetime: float = Field(..., ge=0.0)
+    decading_factor: Optional[float] = Field()
 
     class Config:
         schema_extra = {

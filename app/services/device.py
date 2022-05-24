@@ -9,10 +9,6 @@ from datetime import datetime
 
 import paho.mqtt.client as mqtt
 
-measure_dict = {
-    "temperature": {"min": -273.15, "max": +float("inf")}
-}
-
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     # Subscribing in on_connect() means that if we lose the connection and
@@ -30,15 +26,15 @@ class Device:
     """
     This is the main class to simulate a sensor device.
     """
-    def __init__(self, measure, min_val, max_val, mean_val=0, std_val=1, given_uuid=None, decading_factor=0.000001, malfunctioning_rate=0.02, queue_max_size=10000):
-        self.id = str(uuid.uuid4()) if given_uuid is None else given_uuid
+    def __init__(self, id, measure, min_val, max_val, mean_val=0, std_val=1, decading_factor=0.000001, error_rate=0.02, queue_max_size=10000):
+        self.id = id
         self.measure = measure 
         self.mean_val = mean_val
         self.std_val = std_val
         self.min_val = min_val
         self.max_val = max_val
         self.decading_factor = decading_factor
-        self.malfunctioning_rate = malfunctioning_rate
+        self.error_rate = error_rate
         self.queue_max_size = queue_max_size
         self.recordings_queue = []
         self.recorded_measures = 0
@@ -63,7 +59,7 @@ class Device:
         rec["id"] = self.id
         rec["measure"] = self.measure
         
-        malfunctioning = bool(np.random.binomial(1, self.malfunctioning_rate, 1)[0])
+        malfunctioning = bool(np.random.binomial(1, self.error_rate, 1)[0])
         
         if malfunctioning:
             rec["value"] = float("nan")
