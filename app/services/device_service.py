@@ -1,12 +1,18 @@
-from app.models.device_schema import DeviceSchema
+from models.device_schema import DeviceSchema
 
-from repository.device_repository import DeviceRepository
+from repository.device_repository import *
 
-device_repository = DeviceRepository()
+async def retrieve_devices():
+    pass
 
-class DeviceService:
-    async def __init__(self):
-        pass
+async def add_device():
+    pass
 
-    async def add_device(self):
-        pass
+async def retrieve_device():
+    pass
+
+async def update_device():
+    pass
+
+async def delete_device():
+    pass
