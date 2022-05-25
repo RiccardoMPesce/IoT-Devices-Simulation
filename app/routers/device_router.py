@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Body
-from fastapi.encoders import jsonable_encoder
+from fastapi import APIRouter
 
-from repository.device_database import add_device, delete_device, retrieve_device, retrieve_devices, update_device
+from typing import Optional
+
 from models.device_schema import DeviceSchema, UpdateDeviceModel
+from services.device_service import DeviceService
 
 router = APIRouter()
+device_service = DeviceService()
 
 @router.post("/", response_description="Device data added into the database")
-async def add_student_data(device: DeviceSchema = Body(...)):
-    device = jsonable_encoder(device)
-    new_device = await add_device(device)
-    return {"Added": str(bool(new_device))}
+async def add_device(measure: str, publish_qos: int, decading_factor: Optional[float] = None):
+    return await device_service.add_device(measure, publish_qos, decading_factor)
