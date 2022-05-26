@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Body
+from fastapi.encoders import jsonable_encoder
 
 from models.device_schema import DeviceSchema
 from models.response_schema import ResponseModel
 
-from repository.device_repository import *
+from database.device_database import *
 
 router = APIRouter()
 

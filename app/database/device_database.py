@@ -2,18 +2,12 @@ import motor.motor_asyncio
 
 from common import device_helper
 
+from database.commons import database_client
+
 from bson.objectid import ObjectId
 
-with open(".env", "r+") as env_file:
-    mongo_params = dict(line.strip().split("=") for line in env_file.readlines() if line.strip() != "") 
 
-mongo_host = mongo_params["MONGO_HOST"]
-mongo_port = mongo_params["MONGO_PORT"]
-mongo_details = f"mongodb://{mongo_host}:{mongo_port}"
-
-client = motor.motor_asyncio.AsyncIOMotorClient(mongo_details)
-
-device_database = client.device
+device_database = database_client.device
 
 device_collection = device_database.get_collection("device_collection")
 
