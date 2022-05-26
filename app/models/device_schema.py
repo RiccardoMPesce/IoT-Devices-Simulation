@@ -1,4 +1,6 @@
-from typing import Optional
+from datetime import datetime
+
+from typing import Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -6,9 +8,9 @@ class DeviceSchema(BaseModel):
     device_id: str = Field(...)
     measure: str = Field(...)
     publish_qos: int = Field(..., ge=0, le=2)
-    status: bool = Field(...)
-    update_datetime: float = Field(..., ge=0.0)
-    decading_factor: Optional[float]
+    status: bool = Field(True)
+    update_datetime: float = Field(datetime.utcnow().timestamp(), ge=0.0)
+    decading_factor: float = Field(0.001, ge=0.0, le=1.0)
 
     class Config:
         schema_extra = {
@@ -26,7 +28,8 @@ class UpdateDeviceModel(BaseModel):
     measure: Optional[str]
     publish_qos: Optional[int]
     status: bool = Optional[int]
-    update_datetime: float
+    update_datetime: float = Field(datetime.utcnow().timestamp(), ge=0.0)
+    decading_factor: Optional[float]
 
     class Config:
         schema_extra = {

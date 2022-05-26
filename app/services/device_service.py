@@ -10,17 +10,24 @@ from repository.device_repository import *
 async def retrieve_devices():
     pass
 
-async def add_device(measure: str, publish_qos: int, status: Union[bool, int, str, None], decading_factor: Optional[float] = None):
-    added_timestamp = datetime.utcnow().timestamp()
+async def add_device_service(measure: str, publish_qos: int, status: Union[bool, int, str, None], decading_factor: Optional[float] = None):
+    update_datetime = datetime.utcnow().timestamp()
     device_id = str(uuid4())
-    return await add_device(measure, publish_qos, status, decading_factor)
+    device_data = {
+        "device_id": device_id,
+        "measure": measure,
+        "publish_qos": publish_qos,
+        "status": status,
+        "update_datetime": update_datetime
+    }
+    return await add_device_repository(device_data)
 
 
-async def retrieve_device():
+async def retrieve_device_service():
     pass
 
-async def update_device():
+async def update_device_service():
     pass
 
-async def delete_device():
+async def delete_device_service():
     pass
