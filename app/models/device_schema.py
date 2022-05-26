@@ -1,11 +1,12 @@
 from datetime import datetime
+from uuid import uuid4
 
 from typing import Optional, Union
 
 from pydantic import BaseModel, Field
 
 class DeviceSchema(BaseModel):
-    device_id: str = Field(...)
+    device_id: str = Field(uuid4())
     measure: str = Field(...)
     publish_qos: int = Field(..., ge=0, le=2)
     status: bool = Field(True)
