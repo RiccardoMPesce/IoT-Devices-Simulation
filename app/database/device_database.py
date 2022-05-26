@@ -1,5 +1,3 @@
-import motor.motor_asyncio
-
 from common import device_helper
 
 from database.commons import database_client
@@ -10,6 +8,7 @@ from bson.objectid import ObjectId
 device_database = database_client.device
 
 device_collection = device_database.get_collection("device_collection")
+
 
 async def retrieve_devices():
     devices = []
