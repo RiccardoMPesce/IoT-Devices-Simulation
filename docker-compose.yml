@@ -7,6 +7,8 @@ services:
       - .env
     ports:
       - "27017:27017"
+    volumes:
+      - mongodb:/mongodb
   app:
     build:
       dockerfile: Dockerfile
