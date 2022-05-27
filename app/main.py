@@ -5,7 +5,7 @@ from datetime import datetime
 
 from fastapi import FastAPI
 
-from routers.device_router import router as device_router
+from api.device_router import router as device_router
 
 app = FastAPI(title="Monitoring & Management Microservice")
 app.include_router(device_router, tags=["Device"], prefix="/device")
