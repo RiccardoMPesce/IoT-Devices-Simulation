@@ -5,6 +5,8 @@ services:
     image: mongo
     env_file:
       - .env
+    ports:
+      - "27017:27017"
   app:
     build:
       dockerfile: Dockerfile

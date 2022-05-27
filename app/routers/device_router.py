@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from models.device_schema import DeviceSchema
 from models.response_schema import ResponseModel
 
-from database.device_database import (
+from database.device_crud import (
     retrieve_devices,
     retrieve_device, 
     add_device,
