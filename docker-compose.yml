@@ -3,12 +3,13 @@ version: "3"
 services:
   db:
     image: mongo
+    restart: always
     env_file:
       - .env
     ports:
       - "27017:27017"
     volumes:
-      - mongodb:/mongodb
+      - ./data/mongodb:/data/db
   app:
     build:
       dockerfile: Dockerfile

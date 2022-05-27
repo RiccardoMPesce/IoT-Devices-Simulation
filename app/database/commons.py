@@ -8,6 +8,7 @@ mongo_port = mongo_params["MONGO_PORT"]
 mongo_user = mongo_params["MONGO_USER"]
 mongo_password = mongo_params["MONGO_PASSWORD"]
 mongo_db = mongo_params["MONGO_DB"]
-mongo_details = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
+#mongo_details = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
+mongo_details = f"mongodb://{mongo_user}:{mongo_password}@db:{mongo_port}/{mongo_db}"
 
 database_client = motor.motor_asyncio.AsyncIOMotorClient(mongo_details)
