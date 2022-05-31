@@ -1,3 +1,3 @@
-# Monitoring & Management Microservice
+# IoT Device Simulation
 
-Description is WIP.
+Microservice based application to simulate a scenario where IoT deivces collect measures and record/analyze/manage them.
