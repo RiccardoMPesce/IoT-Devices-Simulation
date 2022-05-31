@@ -1,12 +1,12 @@
 FROM python
 
-WORKDIR /code
+WORKDIR /monitoring-management-microservice
 
-COPY ./requirements.txt /code/requirements.txt
+COPY ./requirements.txt /monitoring-management-microservice/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /monitoring-management-microservice/requirements.txt
 
-# COPY ./app /code/app
-COPY .env /code/app/repository/.env 
+# COPY ./app /monitoring-management-microservice/app
+COPY .env /monitoring-management-microservice/app/repository/.env 
 
 CMD ["python", "app/main.py"]
