@@ -14,12 +14,12 @@ services:
       - MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
     volumes:
       - ./docker/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-  app:
+  monitoring-management-microservice:
     build:
-      dockerfile: Dockerfile
-      context: .
+      dockerfile: ./monitoring-management-microservice/Dockerfile
+      context: ./monitoring-management-microservice
     volumes:
-      - .:/code
+      - ./monitoring-management-microservice:/monitoring-management-microservice
     image: riccardompesce/dsbd-mmms
     env_file:
       - .env
