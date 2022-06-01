@@ -2,11 +2,11 @@ FROM python
 
 WORKDIR /monitoring-management-microservice
 
-COPY ./requirements.txt /monitoring-management-microservice/requirements.txt
+COPY . .
 
-RUN pip install --no-cache-dir --upgrade -r /monitoring-management-microservice/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 # COPY ./app /monitoring-management-microservice/app
-COPY .env /monitoring-management-microservice/app/repository/.env 
+# COPY /../.env ./database/env
 
-CMD ["python", "app/main.py"]
+CMD ["python", "/monitoring-management-microservice/main.py"]
