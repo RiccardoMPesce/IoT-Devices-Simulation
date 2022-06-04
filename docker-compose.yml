@@ -3,6 +3,7 @@ version: "3"
 services:
   db:
     image: mongo
+    container_name: mongodb
     restart: always
     env_file:
       - .env
@@ -16,11 +17,21 @@ services:
       - ./docker/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
   monitoring-management-microservice:
     build: ./monitoring-management-microservice
+    container_name: monitoring-management-microservice
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+    command: python main.py
     volumes:
       - ./monitoring-management-microservice:/monitoring-management-microservice
+      - ./.env:/monitoring-management-microservice/database/.env
     image: riccardompesce/dsbd-mmms
-    env_file:
-      - .env
+    env_file: .env
     depends_on:
       - db
     ports:

@@ -1,11 +1,11 @@
 from common import device_helper
 
-from database.commons import database_client
+# from database.commons import database_client
 
 from bson.objectid import ObjectId
 
 
-device_database = database_client.device
+device_database = 4545
 
 device_collection = device_database.get_collection("device_collection")
 
