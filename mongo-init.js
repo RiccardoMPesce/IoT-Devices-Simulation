@@ -1,14 +1,14 @@
-print('creating collection and user/pwd')
+print("Creating collections and user/password")
 
-db = db.getSiblingDB('conf');
-db.createCollection('devices');
-db.createCollection('measures');
+db = db.getSiblingDB("conf");
+db.createCollection("devices");
+db.createCollection("measures");
 db.createUser(
   {
-    user: 'svc_api',
-    pwd: 'svc_api_password',
-    roles: [{ role: 'readWrite', db: 'api-db' }],
+    user: "admin",
+    pwd: "ds&bd2021-2022",
+    roles: [{ role: "readWrite", db: "conf" }],
   },
 );
 
-print('user/paswd and collection created')
+print("Done creating collections and user/password")
