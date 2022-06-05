@@ -1,9 +1,15 @@
-
 import uvicorn
 
-from datetime import datetime
-
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from starlette_exporter import PrometheusMiddleware, handle_metrics
+
+from config import get_config
+from . import db
+from api import api as public_api
+from utils.logger import logger_config
+
+from datetime import datetime
 
 from api.device_router import router as device_router
 

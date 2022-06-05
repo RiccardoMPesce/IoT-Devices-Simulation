@@ -14,18 +14,18 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
       - MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
     volumes:
-      - ./docker/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongo-init.js:/mongo-init.js:ro
   monitoring-management-microservice:
     build: ./monitoring-management-microservice
     container_name: monitoring-management-microservice
     restart: unless-stopped
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${DB_NAME}
+      - DB_USERNAME=${MONGO_USER}
+      - DB_PASSWORD=${MONGO_PASSWORD}
+      - DB_HOST=${MONGO_HOST}
+      - DB_PORT=${MONGO_PORT}
+      - DB_NAME=${MONGO_DB}
     command: 
       - python 
       - main.py

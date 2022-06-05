@@ -5,7 +5,7 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, Field
 
-class DeviceSchema(BaseModel):
+class Device(BaseModel):
     device_id: str = Field(uuid4())
     measure: str = Field(...)
     publish_qos: int = Field(..., ge=0, le=2)
@@ -24,7 +24,7 @@ class DeviceSchema(BaseModel):
             }
         }
 
-class UpdateDeviceModel(BaseModel):
+class UpdateDevice(BaseModel):
     device_id: Optional[str]
     measure: Optional[str]
     publish_qos: Optional[int]

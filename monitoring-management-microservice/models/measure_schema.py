@@ -30,7 +30,7 @@ class BoolMeasure(BaseModel):
     mean_val: Optional[bool]
     std_val: Optional[bool]
 
-class MeasureSchema(BaseModel):
+class Measure(BaseModel):
     measure_id: str = Field(...)
     measure_name: str = Field(...)
     measure: Union[IntMeasure, FloatMeasure, StrMeasure, BoolMeasure] = Field(..., discriminator="measure_type")

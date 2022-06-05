@@ -8,3 +8,4 @@ matplotlib
 paho-mqtt
 pymongo
 motor
+starlette_exporter
