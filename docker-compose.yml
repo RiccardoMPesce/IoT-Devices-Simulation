@@ -4,7 +4,7 @@ services:
   db:
     image: mongo
     container_name: mongodb
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     ports:
@@ -26,7 +26,9 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - DB_NAME=${DB_NAME}
-    command: python main.py
+    command: 
+      - python 
+      - main.py
     volumes:
       - ./monitoring-management-microservice:/monitoring-management-microservice
       - ./.env:/monitoring-management-microservice/database/.env
