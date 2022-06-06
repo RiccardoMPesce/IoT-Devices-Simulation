@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from db.database_manager import DeviceDatabaseManager, get_database
+from db.database_manager import DeviceDatabaseManager, get_device_database
 from models.error_schema import ErrorResponse
 from models.device_schema import Device
 from utils.logger import logger_config
@@ -21,7 +21,7 @@ router = APIRouter(prefix="user")
         status.HTTP_406_NOT_ACCEPTABLE: {"model": ErrorResponse},
     },
 )
-async def get_all_devices_in_database(db: DeviceDatabaseManager = Depends(get_database)) -> List[Device]:
+async def get_all_devices_in_database(db: DeviceDeviceDatabaseManager = Depends(get_device_database)) -> List[Device]:
     """
     Get all devices from devices mongodb collection
     """
@@ -41,7 +41,7 @@ async def get_all_devices_in_database(db: DeviceDatabaseManager = Depends(get_da
     },
 )
 async def get_user_by_user_id(
-    user_id: str, db: DatabaseManager = Depends(get_database)
+    user_id: str, db: DeviceDatabaseManager = Depends(get_device_database)
 ) -> User:
     """Get one user by providing a user_id: str"""
     user = await db.user_get_one(user_id=user_id)
@@ -63,7 +63,7 @@ async def get_user_by_user_id(
     },
 )
 async def insert_a_new_user(
-    payload: User, db: DatabaseManager = Depends(get_database)
+    payload: User, db: DeviceDatabaseManager = Depends(get_device_database)
 ) -> User:
     user_created = await db.user_insert_one(user=payload)
 
@@ -84,7 +84,7 @@ async def insert_a_new_user(
     },
 )
 async def update_a_user(
-    payload: User, db: DatabaseManager = Depends(get_database)
+    payload: User, db: DeviceDatabaseManager = Depends(get_device_database)
 ) -> User:
     user_updated = await db.user_update_one(user=payload)
 
@@ -105,7 +105,7 @@ async def update_a_user(
     },
 )
 async def delete_a_user(
-    payload: User, db: DatabaseManager = Depends(get_database)
+    payload: User, db: DeviceDatabaseManager = Depends(get_device_database)
 ) -> list:
     user_deleted = await db.user_delete_one(user=payload)
 

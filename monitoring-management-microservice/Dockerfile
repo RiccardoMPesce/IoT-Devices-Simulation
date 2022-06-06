@@ -1,7 +1,9 @@
 FROM python
 
-WORKDIR /monitoring-management-microservice
+WORKDIR /app/monitoring-management-microservice
 
-COPY . .
+COPY . ./
+
+RUN ls -a
 
 RUN pip install --no-cache-dir --upgrade -r requirements.txt

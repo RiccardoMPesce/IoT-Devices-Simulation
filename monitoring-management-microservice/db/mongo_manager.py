@@ -6,14 +6,15 @@ from bson.json_util import dumps
 from fastapi import HTTPException, status
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
-from database_manager import DatabaseManager
+from db.database_manager import DeviceDatabaseManager, MeasureDatabaseManager
 from models.device_schema import Device
+from models.measure_schema import Measure
 from utils.logger import logger_config
 
 logger = logger_config(__name__)
 
 
-class DeviceMongoManager(DatabaseManager):
+class DeviceMongoManager(DeviceDatabaseManager):
     """
     This class extends from ./database_manager.py
     which have the abstract methods to be re-used here.
@@ -102,7 +103,7 @@ class DeviceMongoManager(DatabaseManager):
         return device_deleted
 
 
-class MeasureMongoManager(DatabaseManager):
+class MeasureMongoManager(MeasureDatabaseManager):
     """
     This class extends from ./database_manager.py
     which have the abstract methods to be re-used here.
@@ -145,7 +146,7 @@ class MeasureMongoManager(DatabaseManager):
 
         return len(measures_list)
 
-    async def measure_get_all(self) -> List[Device]:
+    async def measure_get_all(self) -> List[Measure]:
         measures_list = []
         measures = self.db.measures.find()
 
@@ -155,14 +156,14 @@ class MeasureMongoManager(DatabaseManager):
 
         return measures_list
 
-    async def measure_get_one(self, measure_id: str) -> Device:
+    async def measure_get_one(self, measure_id: str) -> Measure:
         measures = self.db.measures.find({"measure_id": measure_id})
 
         async for measure in measures:
             del measure["_id"]
             return json.loads(dumps(measure))
 
-    async def measure_insert_one(self, measure: Device) -> Device:
+    async def measure_insert_one(self, measure: Measure) -> Measure:
         measure_exist = await self.measure_get_one(measure_id=measure.dict()["measure_id"])
         if measure_exist:
             raise HTTPException(
@@ -176,14 +177,14 @@ class MeasureMongoManager(DatabaseManager):
 
         return measure
 
-    async def measure_update_one(self, measure: Device) -> list:
+    async def measure_update_one(self, measure: Measure) -> list:
         _measure = measure.dict()
         await self.db.measures.update_one({"measure_id": _measure["measure_id"]}, {"$set": _measure})
         measure_updated = await self.measure_get_one(measure_id=_measure["measure_id"])
 
         return measure_updated
 
-    async def measure_delete_one(self, measure: Device) -> List[Device]:
+    async def measure_delete_one(self, measure: Measure) -> List[Measure]:
         await self.db.measures.delete_one(measure.dict())
 
         measure_deleted = await self.measure_get_one(measure_id=measure.dict()["measure_id"])
