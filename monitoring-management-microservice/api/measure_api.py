@@ -15,7 +15,7 @@ router = APIRouter(prefix="/measure")
 
 
 @router.get(
-    "all",
+    "s",
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_200_OK: {"model": List[Measure]},
@@ -41,9 +41,7 @@ async def get_all_measures_in_database(db: MeasureDatabaseManager = Depends(get_
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
     },
 )
-async def get_measure_by_measure_id(
-    measure_id: str, db: MeasureDatabaseManager = Depends(get_measure_database)
-) -> Measure:
+async def get_measure_by_measure_id(measure_id: str, db: MeasureDatabaseManager = Depends(get_measure_database)) -> Measure:
     """Get one measure by providing a measure_id: str"""
     measure = await db.measure_get_one(measure_id=measure_id)
 
@@ -63,9 +61,7 @@ async def get_measure_by_measure_id(
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def insert_a_new_measure(
-    payload: Measure, db: MeasureDatabaseManager = Depends(get_measure_database)
-) -> Measure:
+async def insert_a_new_measure(payload: Measure, db: MeasureDatabaseManager = Depends(get_measure_database)) -> Measure:
     measure_created = await db.measure_insert_one(measure=payload)
 
     if measure_created:
@@ -84,9 +80,7 @@ async def insert_a_new_measure(
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def update_a_measure(
-    payload: Measure, db: MeasureDatabaseManager = Depends(get_measure_database)
-) -> Measure:
+async def update_a_measure(payload: Measure, db: MeasureDatabaseManager = Depends(get_measure_database)) -> Measure:
     measure_updated = await db.measure_update_one(measure=payload)
 
     if measure_updated:
@@ -105,9 +99,7 @@ async def update_a_measure(
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def delete_a_measure(
-    payload: Measure, db: MeasureDatabaseManager = Depends(get_measure_database)
-) -> list:
+async def delete_a_measure(payload: Measure, db: MeasureDatabaseManager = Depends(get_measure_database)) -> List:
     measure_deleted = await db.measure_delete_one(measure=payload)
 
     if not measure_deleted:

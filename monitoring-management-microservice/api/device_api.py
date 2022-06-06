@@ -15,7 +15,7 @@ router = APIRouter(prefix="/device")
 
 
 @router.get(
-    "all",
+    "s",
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_200_OK: {"model": List[Device]},
@@ -26,33 +26,34 @@ async def get_all_devices_in_database(db: DeviceDatabaseManager = Depends(get_de
     """
     Get all devices from devices mongodb collection
     """
-    users = await db.user_get_all()
-    if users:
-        return JSONResponse(status_code=status.HTTP_200_OK, content=users)
+    devices = await db.device_get_all()
+    if devices:
+        return JSONResponse(status_code=status.HTTP_200_OK, content=devices)
     raise HTTPException(
         status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="database not ready"
     )
 
 
 @router.get(
-    "/{user_id}",
+    "/{device_id}",
     responses={
         status.HTTP_200_OK: {"model": Device},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
     },
 )
-async def get_user_by_user_id(
-    user_id: str, db: DeviceDatabaseManager = Depends(get_device_database)
-) -> Device:
-    """Get one user by providing a user_id: str"""
-    user = await db.user_get_one(user_id=user_id)
+async def get_device_by_id(device_id: str, db: DeviceDatabaseManager = Depends(get_device_database)) -> Device:
+    """
+    Get one device by providing:
+        - device_id: str
+    """
+    device = await db.device_get_one(device_id=device_id)
 
-    if user:
-        return JSONResponse(status_code=status.HTTP_200_OK, content=user)
+    if device:
+        return JSONResponse(status_code=status.HTTP_200_OK, content=device)
 
     raise HTTPException(
         status_code=status.HTTP_406_NOT_ACCEPTABLE,
-        detail=f"no user found with user_id: {user_id}",
+        detail=f"No device is found with device_id: {device_id}",
     )
 
 
@@ -63,17 +64,17 @@ async def get_user_by_user_id(
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def insert_a_new_user(
+async def insert_a_new_device(
     payload: Device, db: DeviceDatabaseManager = Depends(get_device_database)
 ) -> Device:
-    user_created = await db.user_insert_one(user=payload)
+    device_created = await db.device_insert_one(device=payload)
 
-    if user_created:
-        return JSONResponse(status_code=status.HTTP_201_CREATED, content=user_created)
+    if device_created:
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=device_created)
 
     raise HTTPException(
         status_code=status.HTTP_409_CONFLICT,
-        detail=f"user could not be created",
+        detail=f"device could not be created",
     )
 
 
@@ -84,17 +85,17 @@ async def insert_a_new_user(
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def update_a_user(
+async def update_a_device(
     payload: Device, db: DeviceDatabaseManager = Depends(get_device_database)
 ) -> Device:
-    user_updated = await db.user_update_one(user=payload)
+    device_updated = await db.device_update_one(device=payload)
 
-    if user_updated:
-        return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=user_updated)
+    if device_updated:
+        return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=device_updated)
 
     raise HTTPException(
         status_code=status.HTTP_409_CONFLICT,
-        detail="user could not be updated",
+        detail="device could not be updated",
     )
 
 
@@ -105,15 +106,15 @@ async def update_a_user(
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def delete_a_user(
+async def delete_a_device(
     payload: Device, db: DeviceDatabaseManager = Depends(get_device_database)
 ) -> list:
-    user_deleted = await db.user_delete_one(user=payload)
+    device_deleted = await db.device_delete_one(device=payload)
 
-    if not user_deleted:
+    if not device_deleted:
         return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=[])
 
     raise HTTPException(
         status_code=status.HTTP_409_CONFLICT,
-        detail=f"user could not be deleted",
+        detail=f"device could not be deleted",
     )
