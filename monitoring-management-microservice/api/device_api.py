@@ -3,14 +3,15 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from db.database_manager import DeviceDatabaseManager, get_device_database
+from db.database_manager import DeviceDatabaseManager
+from db.common import get_device_database
 from models.error_schema import ErrorResponse
 from models.device_schema import Device
 from utils.logger import logger_config
 
 logger = logger_config(__name__)
 
-router = APIRouter(prefix="user")
+router = APIRouter(prefix="/device")
 
 
 @router.get(
@@ -21,7 +22,7 @@ router = APIRouter(prefix="user")
         status.HTTP_406_NOT_ACCEPTABLE: {"model": ErrorResponse},
     },
 )
-async def get_all_devices_in_database(db: DeviceDeviceDatabaseManager = Depends(get_device_database)) -> List[Device]:
+async def get_all_devices_in_database(db: DeviceDatabaseManager = Depends(get_device_database)) -> List[Device]:
     """
     Get all devices from devices mongodb collection
     """
@@ -36,13 +37,13 @@ async def get_all_devices_in_database(db: DeviceDeviceDatabaseManager = Depends(
 @router.get(
     "/{user_id}",
     responses={
-        status.HTTP_200_OK: {"model": User},
-        status.HTTP_404_NOT_FOUND: {"model": Error},
+        status.HTTP_200_OK: {"model": Device},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
     },
 )
 async def get_user_by_user_id(
     user_id: str, db: DeviceDatabaseManager = Depends(get_device_database)
-) -> User:
+) -> Device:
     """Get one user by providing a user_id: str"""
     user = await db.user_get_one(user_id=user_id)
 
@@ -58,13 +59,13 @@ async def get_user_by_user_id(
 @router.put(
     "",
     responses={
-        status.HTTP_201_CREATED: {"model": User},
-        status.HTTP_409_CONFLICT: {"model": Error},
+        status.HTTP_201_CREATED: {"model": Device},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
 async def insert_a_new_user(
-    payload: User, db: DeviceDatabaseManager = Depends(get_device_database)
-) -> User:
+    payload: Device, db: DeviceDatabaseManager = Depends(get_device_database)
+) -> Device:
     user_created = await db.user_insert_one(user=payload)
 
     if user_created:
@@ -79,13 +80,13 @@ async def insert_a_new_user(
 @router.patch(
     "",
     responses={
-        status.HTTP_202_ACCEPTED: {"model": User},
-        status.HTTP_409_CONFLICT: {"model": Error},
+        status.HTTP_202_ACCEPTED: {"model": Device},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
 async def update_a_user(
-    payload: User, db: DeviceDatabaseManager = Depends(get_device_database)
-) -> User:
+    payload: Device, db: DeviceDatabaseManager = Depends(get_device_database)
+) -> Device:
     user_updated = await db.user_update_one(user=payload)
 
     if user_updated:
@@ -100,12 +101,12 @@ async def update_a_user(
 @router.delete(
     "",
     responses={
-        status.HTTP_202_ACCEPTED: {"model": User},
-        status.HTTP_409_CONFLICT: {"model": Error},
+        status.HTTP_202_ACCEPTED: {"model": Device},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
 async def delete_a_user(
-    payload: User, db: DeviceDatabaseManager = Depends(get_device_database)
+    payload: Device, db: DeviceDatabaseManager = Depends(get_device_database)
 ) -> list:
     user_deleted = await db.user_delete_one(user=payload)
 

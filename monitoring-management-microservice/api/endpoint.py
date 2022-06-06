@@ -5,7 +5,7 @@ from fastapi import APIRouter
 from api.device_api import router as device_router 
 from api.measure_api import router as measure_router
 
-endpoint = APIRouter(prefix="/")
+endpoint = APIRouter()
 
 endpoint.include_router(device_router)
 endpoint.include_router(measure_router)

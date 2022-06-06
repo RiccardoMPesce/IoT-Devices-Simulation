@@ -3,14 +3,15 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from db.database_manager import MeasureDatabaseManager, get_measure_database
+from db.database_manager import MeasureDatabaseManager
+from db.common import get_measure_database
 from models.error_schema import ErrorResponse
 from models.measure_schema import Measure
 from utils.logger import logger_config
 
 logger = logger_config(__name__)
 
-router = APIRouter(prefix="measure")
+router = APIRouter(prefix="/measure")
 
 
 @router.get(
