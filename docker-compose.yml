@@ -14,14 +14,14 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
       - MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
     volumes:
-      - ./data:/data/db 
-      - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongodb_data/:/data/db/
+      - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
   mongo-express:
     container_name: mongo-express
     image: mongo-express
     restart: always
     depends_on:
-      - db
+      - mongodb
     environment:
       - ME_CONFIG_MONGODB_SERVER=$MONGO_HOST
       - ME_CONFIG_MONGODB_PORT=$MONGO_PORT
@@ -33,7 +33,7 @@ services:
     ports:
       - 8081:8081
     volumes: 
-      - ./mongodb_data:/data/db 
+      - ./mongodb_data/:/data/db/
   monitoring-management-microservice:
     build: ./monitoring-management-microservice
     command: python main.py
@@ -47,10 +47,10 @@ services:
       - DB_PORT=${MONGO_PORT}
       - DB_NAME=${MONGO_DB}
     volumes:
-      - ./monitoring-management-microservice:/app/monitoring-management-microservice
+      - ./monitoring-management-microservice/:/app/monitoring-management-microservice/
     env_file: .env
     depends_on:
-      - ./mongodb_data:/data/db 
+      - mongodb
     ports:
       - 8080:8080
 

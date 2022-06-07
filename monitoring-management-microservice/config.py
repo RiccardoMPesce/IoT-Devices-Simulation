@@ -9,17 +9,17 @@ def database_uri():
     """
     DB connection details
     """
-    DB_HOST = os.getenv("MONGO_HOST", "localhost")
-    DB_PORT = os.getenv("MONGO_PORT", "27017")
-    DB_NAME = os.getenv("MONGO_DB", "conf")
-    DB_USERNAME = os.getenv("MONGO_USER")
-    DB_PASSWORD = os.getenv("MONGO_PASSWORD")
+    db_host = os.getenv("MONGO_HOST", "mongodb")
+    db_port = os.getenv("MONGO_PORT", "27017")
+    db_name = os.getenv("MONGO_DB", "conf")
+    db_username = os.getenv("MONGO_USER", "admin")
+    db_password = os.getenv("MONGO_PASSWORD")
 
-    MONGODB_CLIENT_SETUP = (
-        f"mongodb://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    mongodb_client_setup = (
+        f"mongodb://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}"
     )
 
-    return MONGODB_CLIENT_SETUP
+    return mongodb_client_setup
 
 
 class Settings(BaseSettings):
@@ -27,13 +27,13 @@ class Settings(BaseSettings):
     App config settings
     """
 
-    PROJECT_NAME: str
-    VERSION: str
-    DESCRIPTION: str
-    SECRET_KET: str = secrets.token_urlsafe(32)
-    DEBUG: bool = bool(os.getenv("DEBUG", "False"))
-    ENVIRONMENT: str
-    DB_URI = database_uri()
+    project_name: str
+    version: str
+    description: str
+    secret_ket: str = secrets.token_urlsafe(32)
+    debug: bool = bool(os.getenv("DEBUG", "False"))
+    environment: str
+    db_uri = database_uri()
 
     class Config:
         case_sensitive = True
