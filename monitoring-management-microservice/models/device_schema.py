@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -23,6 +23,7 @@ class Device(BaseModel):
                 "update_datetime": 1653384081.510052
             }
         }
+
 
 class UpdateDevice(BaseModel):
     device_id: Optional[str]

@@ -68,16 +68,14 @@ async def get_device_by_id(device_id: str, db: DatabaseManager = Depends(get_dat
     },
 )
 async def insert_a_new_device(measure: str, publish_qos: int, db: DatabaseManager = Depends(get_database)) -> Device:
-    payload = {
+    payload = Device.parse_obj({
         "device_id": str(uuid4()),
         "measure": measure,
         "publish_qos": publish_qos,
         "status": True,
         "update_datetime": datetime.utcnow().timestamp()
-    }
+    })
 
-
-    
     device_created = await db.device_insert_one(device=payload)
 
     if device_created:
