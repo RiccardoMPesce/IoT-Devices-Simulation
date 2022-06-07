@@ -9,17 +9,17 @@ def database_uri():
     """
     DB connection details
     """
-    db_host = os.getenv("MONGO_HOST", "mongodb")
-    db_port = os.getenv("MONGO_PORT", "27017")
-    db_name = os.getenv("MONGO_DB", "conf")
-    db_username = os.getenv("MONGO_USER", "admin")
-    db_password = os.getenv("MONGO_PASSWORD")
+    DB_HOST = os.getenv("MONGO_HOST", "mongodb")
+    DB_PORT = os.getenv("MONGO_PORT", "27017")
+    DB_NAME = os.getenv("MONGO_DB", "conf")
+    DB_USERNAME = os.getenv("MONGO_USER", "admin")
+    DB_PASSWORD = os.getenv("MONGO_PASSWORD")
 
-    mongodb_client_setup = (
-        f"mongodb://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}"
+    MONGODB_CLIENT_SETUP = (
+        f"mongodb://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     )
 
-    return mongodb_client_setup
+    return MONGODB_CLIENT_SETUP
 
 
 class Settings(BaseSettings):
@@ -27,13 +27,13 @@ class Settings(BaseSettings):
     App config settings
     """
 
-    project_name: str
-    version: str
-    description: str
-    secret_ket: str = secrets.token_urlsafe(32)
-    debug: bool = bool(os.getenv("DEBUG", "False"))
-    environment: str
-    db_uri = database_uri()
+    PROJECT_NAME: str = "Monitoring-Management-Microservice"
+    VERSION: str = "1.0"
+    DESCRIPTION: str = "Simple app to monitor and manage IoT remote devices"
+    SECRET_KET: str = secrets.token_urlsafe(32)
+    DEBUG: bool = bool(os.getenv("DEBUG", "False"))
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "dev")
+    DB_URI = database_uri()
 
     class Config:
         case_sensitive = True

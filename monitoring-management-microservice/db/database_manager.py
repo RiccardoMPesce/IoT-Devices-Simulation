@@ -5,7 +5,7 @@ from models.device_schema import Device
 from models.measure_schema import Measure
 
 
-class DeviceDatabaseManager:
+class DatabaseManager:
     """
     This class is meant to be extended from
     ./mongo_manager.py which will be the actual connection to mongodb.
@@ -53,29 +53,6 @@ class DeviceDatabaseManager:
 
     @abstractmethod
     async def device_delete_one(self, device: Device) -> List[Device]:
-        pass
-
-
-class MeasureDatabaseManager:
-    """
-    This class is meant to be extended from
-    ./mongo_manager.py which will be the actual connection to mongodb.
-    """
-
-    @property
-    def client(self):
-        raise NotImplementedError
-
-    @property
-    def db(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    async def connect_to_database(self, path: str):
-        pass
-
-    @abstractmethod
-    async def close_database_connection(self):
         pass
 
     @abstractmethod

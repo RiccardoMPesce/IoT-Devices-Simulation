@@ -3,8 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from db.database_manager import MeasureDatabaseManager
-from db.common import get_measure_database
+from db.database_manager import DatabaseManager
+from db.common import get_database
 from models.error_schema import ErrorResponse
 from models.measure_schema import Measure
 from utils.logger import logger_config
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/measure")
         status.HTTP_406_NOT_ACCEPTABLE: {"model": ErrorResponse},
     },
 )
-async def get_all_measures_in_database(db: MeasureDatabaseManager = Depends(get_measure_database)) -> List[Measure]:
+async def get_all_measures_in_database(db: DatabaseManager = Depends(get_database)) -> List[Measure]:
     """
     Get all measures from measures mongodb collection
     """
@@ -41,7 +41,7 @@ async def get_all_measures_in_database(db: MeasureDatabaseManager = Depends(get_
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
     },
 )
-async def get_measure_by_measure_id(measure_id: str, db: MeasureDatabaseManager = Depends(get_measure_database)) -> Measure:
+async def get_measure_by_measure_id(measure_id: str, db: DatabaseManager = Depends(get_database)) -> Measure:
     """Get one measure by providing a measure_id: str"""
     measure = await db.measure_get_one(measure_id=measure_id)
 
@@ -61,7 +61,7 @@ async def get_measure_by_measure_id(measure_id: str, db: MeasureDatabaseManager 
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def insert_a_new_measure(payload: Measure, db: MeasureDatabaseManager = Depends(get_measure_database)) -> Measure:
+async def insert_a_new_measure(payload: Measure, db: DatabaseManager = Depends(get_database)) -> Measure:
     measure_created = await db.measure_insert_one(measure=payload)
 
     if measure_created:
@@ -80,7 +80,7 @@ async def insert_a_new_measure(payload: Measure, db: MeasureDatabaseManager = De
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def update_a_measure(payload: Measure, db: MeasureDatabaseManager = Depends(get_measure_database)) -> Measure:
+async def update_a_measure(payload: Measure, db: DatabaseManager = Depends(get_database)) -> Measure:
     measure_updated = await db.measure_update_one(measure=payload)
 
     if measure_updated:
@@ -99,7 +99,7 @@ async def update_a_measure(payload: Measure, db: MeasureDatabaseManager = Depend
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def delete_a_measure(payload: Measure, db: MeasureDatabaseManager = Depends(get_measure_database)) -> List:
+async def delete_a_measure(payload: Measure, db: DatabaseManager = Depends(get_database)) -> List:
     measure_deleted = await db.measure_delete_one(measure=payload)
 
     if not measure_deleted:

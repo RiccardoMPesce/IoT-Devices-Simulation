@@ -3,11 +3,14 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from db.database_manager import DeviceDatabaseManager
-from db.common import get_device_database
+from db.database_manager import DatabaseManager
+from db.common import get_database
 from models.error_schema import ErrorResponse
 from models.device_schema import Device
 from utils.logger import logger_config
+
+from datetime import datetime
+from uuid import uuid4
 
 logger = logger_config(__name__)
 
@@ -22,7 +25,7 @@ router = APIRouter(prefix="/device")
         status.HTTP_406_NOT_ACCEPTABLE: {"model": ErrorResponse},
     },
 )
-async def get_all_devices_in_database(db: DeviceDatabaseManager = Depends(get_device_database)) -> List[Device]:
+async def get_all_devices_in_database(db: DatabaseManager = Depends(get_database)) -> List[Device]:
     """
     Get all devices from devices mongodb collection
     """
@@ -30,7 +33,7 @@ async def get_all_devices_in_database(db: DeviceDatabaseManager = Depends(get_de
     if devices:
         return JSONResponse(status_code=status.HTTP_200_OK, content=devices)
     raise HTTPException(
-        status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="database not ready"
+        status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Database not ready"
     )
 
 
@@ -41,7 +44,7 @@ async def get_all_devices_in_database(db: DeviceDatabaseManager = Depends(get_de
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
     },
 )
-async def get_device_by_id(device_id: str, db: DeviceDatabaseManager = Depends(get_device_database)) -> Device:
+async def get_device_by_id(device_id: str, db: DatabaseManager = Depends(get_database)) -> Device:
     """
     Get one device by providing:
         - device_id: str
@@ -64,9 +67,17 @@ async def get_device_by_id(device_id: str, db: DeviceDatabaseManager = Depends(g
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def insert_a_new_device(
-    payload: Device, db: DeviceDatabaseManager = Depends(get_device_database)
-) -> Device:
+async def insert_a_new_device(measure: str, publish_qos: int, db: DatabaseManager = Depends(get_database)) -> Device:
+    payload = {
+        "device_id": str(uuid4()),
+        "measure": measure,
+        "publish_qos": publish_qos,
+        "status": True,
+        "update_datetime": datetime.utcnow().timestamp()
+    }
+
+
+    
     device_created = await db.device_insert_one(device=payload)
 
     if device_created:
@@ -86,7 +97,7 @@ async def insert_a_new_device(
     },
 )
 async def update_a_device(
-    payload: Device, db: DeviceDatabaseManager = Depends(get_device_database)
+    payload: Device, db: DatabaseManager = Depends(get_database)
 ) -> Device:
     device_updated = await db.device_update_one(device=payload)
 
@@ -107,7 +118,7 @@ async def update_a_device(
     },
 )
 async def delete_a_device(
-    payload: Device, db: DeviceDatabaseManager = Depends(get_device_database)
+    payload: Device, db: DatabaseManager = Depends(get_database)
 ) -> list:
     device_deleted = await db.device_delete_one(device=payload)
 

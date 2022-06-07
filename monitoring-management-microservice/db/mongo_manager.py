@@ -6,7 +6,7 @@ from bson.json_util import dumps
 from fastapi import HTTPException, status
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
-from db.database_manager import DeviceDatabaseManager, MeasureDatabaseManager
+from db.database_manager import DatabaseManager
 from models.device_schema import Device
 from models.measure_schema import Measure
 from utils.logger import logger_config
@@ -14,7 +14,7 @@ from utils.logger import logger_config
 logger = logger_config(__name__)
 
 
-class DeviceMongoManager(DeviceDatabaseManager):
+class MongoManager(DatabaseManager):
     """
     This class extends from ./database_manager.py
     which have the abstract methods to be re-used here.
@@ -28,16 +28,9 @@ class DeviceMongoManager(DeviceDatabaseManager):
         logger.info("Connecting to MongoDB")
         self.client = AsyncIOMotorClient(path, maxPoolSize=10, minPoolSize=10)
 
-        if os.getenv("ENVIRONMENT") == "PRD":
-            self.db = self.client.devices_prd
-        elif os.getenv("ENVIRONMENT") == "STG":
-            self.db = self.client.devices_stg
-        else:
-            self.db = self.client.devices_dev
+        self.db = self.client.dev
 
-        logger.info(
-            "Connected to MongoDB -  %s environment!", os.getenv("ENVIRONMENT", "DEV")
-        )
+        logger.info("Connected to MongoDB - " + os.getenv("ENVIRONMENT", "dev") + " environment!")
 
     async def close_database_connection(self):
         logger.info("Closing connection to MongoDB")
@@ -101,37 +94,6 @@ class DeviceMongoManager(DeviceDatabaseManager):
         device_deleted = await self.device_get_one(device_id=device.dict()["device_id"])
 
         return device_deleted
-
-
-class MeasureMongoManager(MeasureDatabaseManager):
-    """
-    This class extends from ./database_manager.py
-    which have the abstract methods to be re-used here.
-    """
-
-    client: AsyncIOMotorClient = None
-    db: AsyncIOMotorDatabase = None
-
-    # database connect and close connections
-    async def connect_to_database(self, path: str):
-        logger.info("Connecting to MongoDB")
-        self.client = AsyncIOMotorClient(path, maxPoolSize=10, minPoolSize=10)
-
-        if os.getenv("ENVIRONMENT") == "PRD":
-            self.db = self.client.measures_prd
-        elif os.getenv("ENVIRONMENT") == "STG":
-            self.db = self.client.measures_stg
-        else:
-            self.db = self.client.measures_dev
-
-        logger.info(
-            "Connected to MongoDB -  %s environment!", os.getenv("ENVIRONMENT", "DEV")
-        )
-
-    async def close_database_connection(self):
-        logger.info("Closing connection to MongoDB")
-        self.client.close()
-        logger.info("MongoDB connection closed")
 
     # to be used from /api/public endpoints
     async def measure_get_total(self) -> int:

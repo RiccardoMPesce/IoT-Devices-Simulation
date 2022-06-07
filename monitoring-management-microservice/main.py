@@ -7,15 +7,44 @@ from fastapi import FastAPI
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 
 from config import get_config
-from db.common import get_device_database, get_measure_database
+from db.common import get_database, db
 from api.endpoint import endpoint
 from utils.logger import logger_config
 
 from datetime import datetime
 
-app = FastAPI(title="Monitoring & Management Microservice")
+settings = get_config()
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION,
+    description=settings.DESCRIPTION,
+    docs_url="/docs"
+)
 
 app.include_router(endpoint)
+
+settings = get_config()
+
+logger = logger_config(__name__)
+
+# Add Prometheus
+app.add_middleware(PrometheusMiddleware)
+app.add_route("/metrics", handle_metrics)
+
+logger.info("API launched for " + settings.ENVIRONMENT + " environment")
+
+# Connecting to the datatabase
+@app.on_event("startup")
+async def startup():
+    logger.info("Connecting to the database")
+    await db.connect_to_database(path=settings.DB_URI)
+
+# Disconnecting from the database
+@app.on_event("shutdown")
+async def startup():
+    logger.info("Connecting to the database")
+    await db.close_database_connection()
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)

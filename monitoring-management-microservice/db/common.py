@@ -1,12 +1,7 @@
-from db.database_manager import DeviceDatabaseManager, MeasureDatabaseManager
-from db.mongo_manager import DeviceMongoManager, MeasureMongoManager
+from db.database_manager import DatabaseManager
+from db.mongo_manager import MongoManager
 
-device_db = DeviceMongoManager()
-measure_db = MeasureMongoManager()
+db = MongoManager()
 
-
-async def get_device_database() -> DeviceDatabaseManager:
-    return device_db
-
-async def get_measure_database() -> MeasureDatabaseManager:
-    return measure_db
+async def get_database() -> DatabaseManager:
+    return db
