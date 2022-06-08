@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -67,7 +67,9 @@ async def get_device_by_id(device_id: str, db: DatabaseManager = Depends(get_dat
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def insert_a_new_device(measure: str, publish_qos: int, db: DatabaseManager = Depends(get_database)) -> Device:
+async def insert_a_new_device(measure: str, 
+                              publish_qos: int, 
+                              db: DatabaseManager = Depends(get_database)) -> Device:
     payload = Device.parse_obj({
         "device_id": str(uuid4()),
         "measure": measure,
@@ -94,9 +96,20 @@ async def insert_a_new_device(measure: str, publish_qos: int, db: DatabaseManage
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def update_a_device(
-    payload: Device, db: DatabaseManager = Depends(get_database)
-) -> Device:
+async def update_a_device(device_id: str, 
+                          measure: Optional[str], 
+                          publish_qos: Optional[int],
+                          status: bool,
+                          db: DatabaseManager = Depends(get_database)) -> Device:
+    
+    payload = Device.parse_obj({
+        "device_id": device_id,
+        "measure": measure,
+        "publish_qos": publish_qos,
+        "status": status,
+        "update_datetime": datetime.utcnow().timestamp()
+    })
+
     device_updated = await db.device_update_one(device=payload)
 
     if device_updated:
