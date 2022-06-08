@@ -38,7 +38,7 @@ logger.info("API launched for " + settings.ENVIRONMENT + " environment")
 @app.on_event("startup")
 async def startup():
     logger.info("Connecting to the database")
-    await db.connect_to_database(path=settings.DB_URI)
+    await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
 
 # Disconnecting from the database
 @app.on_event("shutdown")

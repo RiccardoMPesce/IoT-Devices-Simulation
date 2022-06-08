@@ -24,11 +24,11 @@ class MongoManager(DatabaseManager):
     db: AsyncIOMotorDatabase = None
 
     # database connect and close connections
-    async def connect_to_database(self, path: str):
+    async def connect_to_database(self, path: str, db_name: str):
         logger.info("Connecting to MongoDB")
         self.client = AsyncIOMotorClient(path, maxPoolSize=10, minPoolSize=10)
 
-        self.db = self.client.dev
+        self.db = self.client[db_name]
 
         logger.info("Connected to MongoDB - " + os.getenv("ENVIRONMENT", "dev") + " environment!")
 
