@@ -2,7 +2,6 @@ from abc import abstractmethod
 from typing import List
 
 from models.device_schema import Device
-from models.measure_schema import Measure
 
 
 class DatabaseManager:
@@ -55,30 +54,3 @@ class DatabaseManager:
     async def device_delete_one(self, device_id: str) -> List[Device]:
         pass
 
-    @abstractmethod
-    async def measure_get_total(self) -> int:
-        pass
-
-    @abstractmethod
-    async def measure_get_actives(self) -> int:
-        pass
-
-    @abstractmethod
-    async def measure_get_all(self) -> List[Measure]:
-        pass
-
-    @abstractmethod
-    async def measure_get_one(self, measure_id: str) -> List[Measure]:
-        pass
-
-    @abstractmethod
-    async def measure_insert_one(self, measure: Measure) -> List[Measure]:
-        pass
-
-    @abstractmethod
-    async def measure_update_one(self, measure: Measure) -> List[Measure]:
-        pass
-
-    @abstractmethod
-    async def measure_delete_one(self, measure: Measure) -> List[Measure]:
-        pass

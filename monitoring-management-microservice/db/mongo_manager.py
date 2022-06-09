@@ -8,7 +8,6 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from db.database_manager import DatabaseManager
 from models.device_schema import Device, UpdateDevice
-from models.measure_schema import Measure
 from utils.logger import logger_config
 
 logger = logger_config(__name__)
@@ -107,61 +106,3 @@ class MongoManager(DatabaseManager):
         deleted_device = await self.device_get_one({"device_id": device_id})
 
         return deleted_device
-
-    # to be used from /api/public endpoints
-    async def measure_get_total(self) -> int:
-        total = await self.db.measures.count_documents({})
-        return total
-
-    async def measure_get_actives(self) -> int:
-        measures = self.db.measures.find({"status": True})
-        measures_list = []
-        async for measure in measures:
-            measures_list.append(json.loads(dumps(measure)))
-
-        return len(measures_list)
-
-    async def measure_get_all(self) -> List[Measure]:
-        measures_list = []
-        measures = self.db.measures.find()
-
-        async for measure in measures:
-            del measure["_id"]
-            measures_list.append(json.loads(dumps(measure)))
-
-        return measures_list
-
-    async def measure_get_one(self, measure_id: str) -> Measure:
-        measures = self.db.measures.find({"measure_id": measure_id})
-
-        async for measure in measures:
-            del measure["_id"]
-            return json.loads(dumps(measure))
-
-    async def measure_insert_one(self, measure: Measure) -> Measure:
-        measure_exist = await self.measure_get_one(measure_id=measure.dict()["measure_id"])
-        if measure_exist:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"measure: {measure_exist['measure_id']} already exist",
-            )
-
-        await self.db.measures.insert_one(measure.dict())
-
-        measure = await self.measure_get_one(measure_id=measure.dict()["measure_id"])
-
-        return measure
-
-    async def measure_update_one(self, measure: Measure) -> list:
-        _measure = measure.dict()
-        await self.db.measures.update_one({"measure_id": _measure["measure_id"]}, {"$set": _measure})
-        measure_updated = await self.measure_get_one(measure_id=_measure["measure_id"])
-
-        return measure_updated
-
-    async def measure_delete_one(self, measure: Measure) -> List[Measure]:
-        await self.db.measures.delete_one(measure.dict())
-
-        measure_deleted = await self.measure_get_one(measure_id=measure.dict()["measure_id"])
-
-        return measure_deleted
