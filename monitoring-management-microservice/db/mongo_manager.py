@@ -7,7 +7,7 @@ from fastapi import HTTPException, status
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from db.database_manager import DatabaseManager
-from models.device_schema import Device
+from models.device_schema import Device, UpdateDevice
 from models.measure_schema import Measure
 from utils.logger import logger_config
 
@@ -81,12 +81,26 @@ class MongoManager(DatabaseManager):
 
         return device
 
-    async def device_update_one(self, device: Device) -> list:
+    async def device_update_one(self, device: UpdateDevice) -> list:
         _device = device.dict()
-        await self.db.devices.update_one({"device_id": _device["device_id"]}, {"$set": _device})
-        device_updated = await self.device_get_one(device_id=_device["device_id"])
+        device_to_update = await self.device_get_one(device_id=_device["device_id"])
+        
+        if device_to_update:
+            for k, v in _device.items():
+                if v is not None:
+                    device_to_update[k] = v
 
-        return device_updated
+            logger.info(str(device_to_update))
+
+            await self.db.devices.update_one({"device_id": _device["device_id"]}, {"$set": device_to_update})
+            device_updated = await self.device_get_one(device_id=_device["device_id"])
+
+            return device_updated
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Device with id " + _device["device_id"] + " not found"
+            )
 
     async def device_delete_one(self, device: Device) -> List[Device]:
         await self.db.devices.delete_one(device.dict())

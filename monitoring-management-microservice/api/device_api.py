@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from db.database_manager import DatabaseManager
 from db.common import get_database
 from models.error_schema import ErrorResponse
-from models.device_schema import Device
+from models.device_schema import Device, UpdateDevice
 from utils.logger import logger_config
 
 from datetime import datetime
@@ -97,18 +97,21 @@ async def insert_a_new_device(measure: str,
     },
 )
 async def update_a_device(device_id: str, 
-                          measure: Optional[str], 
-                          publish_qos: Optional[int],
-                          status: bool,
-                          db: DatabaseManager = Depends(get_database)) -> Device:
-    
-    payload = Device.parse_obj({
+                          measure: Optional[str] = None, 
+                          publish_qos: Optional[int] = None,
+                          device_status: Optional[bool] = None,
+                          db: DatabaseManager = Depends(get_database)) -> UpdateDevice:
+    payload = {k: v for k, v in {
         "device_id": device_id,
         "measure": measure,
         "publish_qos": publish_qos,
-        "status": status,
+        "status": device_status,
         "update_datetime": datetime.utcnow().timestamp()
-    })
+    }.items() if v is not None}
+
+    logger.info("Updating" + str(payload))
+
+    payload = UpdateDevice.parse_obj(payload)
 
     device_updated = await db.device_update_one(device=payload)
 

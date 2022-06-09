@@ -22,3 +22,21 @@ class Device(BaseModel):
                 "update_datetime": 1653384081.510052
             }
         }
+
+class UpdateDevice(BaseModel):
+    device_id: Optional[str]
+    measure: Optional[str]
+    publish_qos: Optional[int]
+    status: Optional[bool]
+    update_datetime: float = Field(datetime.utcnow().timestamp(), ge=0.0)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "device_id": "D1927821-D37B-4C52-A5D3-0579CCFFC6B6",
+                "measure": "luminosity-room2",
+                "publish_qos": 1,
+                "status": "off",
+                "update_datetime": 1653384081.540054
+            }
+        }
