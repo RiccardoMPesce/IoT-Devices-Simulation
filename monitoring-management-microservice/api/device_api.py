@@ -131,10 +131,8 @@ async def update_a_device(device_id: str,
         status.HTTP_409_CONFLICT: {"model": ErrorResponse},
     },
 )
-async def delete_a_device(
-    payload: Device, db: DatabaseManager = Depends(get_database)
-) -> list:
-    device_deleted = await db.device_delete_one(device=payload)
+async def delete_a_device(device_id: str, db: DatabaseManager = Depends(get_database)) -> list:
+    device_deleted = await db.device_delete_one(device_id=device_id)
 
     if not device_deleted:
         return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=[])

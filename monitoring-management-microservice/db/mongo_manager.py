@@ -84,13 +84,12 @@ class MongoManager(DatabaseManager):
     async def device_update_one(self, device: UpdateDevice) -> list:
         _device = device.dict()
         device_to_update = await self.device_get_one(device_id=_device["device_id"])
-        
+        logger.info(str(device_to_update))
+
         if device_to_update:
             for k, v in _device.items():
                 if v is not None:
                     device_to_update[k] = v
-
-            logger.info(str(device_to_update))
 
             await self.db.devices.update_one({"device_id": _device["device_id"]}, {"$set": device_to_update})
             device_updated = await self.device_get_one(device_id=_device["device_id"])
@@ -102,12 +101,12 @@ class MongoManager(DatabaseManager):
                 detail=f"Device with id " + _device["device_id"] + " not found"
             )
 
-    async def device_delete_one(self, device: Device) -> List[Device]:
-        await self.db.devices.delete_one(device.dict())
+    async def device_delete_one(self, device_id: str) -> List[Device]:
+        await self.db.devices.delete_one({"device_id": device_id})
+            
+        deleted_device = await self.device_get_one({"device_id": device_id})
 
-        device_deleted = await self.device_get_one(device_id=device.dict()["device_id"])
-
-        return device_deleted
+        return deleted_device
 
     # to be used from /api/public endpoints
     async def measure_get_total(self) -> int:

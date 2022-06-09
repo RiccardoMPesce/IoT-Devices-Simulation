@@ -52,7 +52,7 @@ class DatabaseManager:
         pass
 
     @abstractmethod
-    async def device_delete_one(self, device: Device) -> List[Device]:
+    async def device_delete_one(self, device_id: str) -> List[Device]:
         pass
 
     @abstractmethod
