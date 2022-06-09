@@ -9,3 +9,4 @@ paho-mqtt
 pymongo
 motor
 starlette_exporter
+fastapi-mqtt

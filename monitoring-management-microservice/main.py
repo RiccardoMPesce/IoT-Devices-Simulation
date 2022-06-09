@@ -11,6 +11,10 @@ from db.common import get_database, db
 from api.endpoint import endpoint
 from utils.logger import logger_config
 
+# MQTT
+from fastapi_mqtt.fastmqtt import FastMQTT
+from fastapi_mqtt.config import MQTTConfig
+
 from datetime import datetime
 
 settings = get_config()
@@ -22,11 +26,23 @@ app = FastAPI(
     docs_url="/docs"
 )
 
+mqtt_config = MQTTConfig()
+
+fast_mqtt = FastMQTT(config=mqtt_config)
+
+fast_mqtt.init_app(app)
+
 app.include_router(endpoint)
 
 settings = get_config()
 
 logger = logger_config(__name__)
+
+# MQTT settings
+@mqtt.on_connect()
+def connect(client, flags, rc, properties):
+    mqtt.client.subscribe("/mqtt")
+    print("Connected: ", client, flags, rc, properties)
 
 # Add Prometheus
 app.add_middleware(PrometheusMiddleware)
