@@ -10,7 +10,7 @@ from config import get_config
 from db.common import get_database, db
 from api.endpoint import endpoint
 from utils.logger import logger_config
-from utils.kafka_consumer import consumer, consume
+from utils.kafka_consumer import consume
 
 from datetime import datetime
 
@@ -44,7 +44,6 @@ logger.info("API launched for " + settings.ENVIRONMENT + " environment")
 async def startup():
     logger.info("Connecting to the database")
     await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
-    await consumer.start()
     await consume()
 
 # Disconnecting from the database

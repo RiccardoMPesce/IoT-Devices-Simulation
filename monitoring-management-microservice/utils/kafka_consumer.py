@@ -8,17 +8,17 @@ logger = logger_config(__name__)
 
 configs = get_config()
 
-def get_consumer() -> AIOKafkaConsumer:
+def get_device_consumer() -> AIOKafkaConsumer:
     return AIOKafkaConsumer(
-        configs["KAFKA_TOPICS"],
-        bootstrap_servers=configs["KAFKA_INSTANCE"]
+        configs.KAFKA_TOPIC_DEVICES,
+        bootstrap_servers=configs.KAFKA_INSTANCE
     )
 
-consumer = get_consumer()
-
 async def consume():
+    device_consumer = get_device_consumer()
+    await device_consumer.start()
     while True:
-        async for msg in consumer:
+        async for msg in device_consumer:
             payload = {
                 "topic": msg["topic"],
                 "partition": msg["partition"],
