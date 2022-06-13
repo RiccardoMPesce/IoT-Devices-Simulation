@@ -9,5 +9,6 @@ paho-mqtt
 pymongo
 motor
 starlette_exporter
+starlette
 fastapi-mqtt
 aiokafka

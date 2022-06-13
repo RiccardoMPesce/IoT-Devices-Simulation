@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "dev")
     DB_NAME: str = os.getenv("MONGO_DB", "conf")
     DB_URI = database_uri()
+    KAFKA_HOST: str = os.getenv("KAFKA_HOST", "kafka")
+    KAFKA_PORT: str = os.getenv("KAFKA_PORT", "9092")
+    KAFKA_TOPICS: str = os.getenv("KAFKA_TOPICS", ["devices"])
+    KAFKA_INSTANCE = f"{KAFKA_HOST}:{KAFKA_PORT}"
 
     class Config:
         case_sensitive = True
