@@ -14,6 +14,18 @@ def get_consumer() -> AIOKafkaConsumer:
         bootstrap_servers=configs["KAFKA_INSTANCE"]
     )
 
+consumer = get_consumer()
+
 async def consume():
-    pass
+    while True:
+        async for msg in consumer:
+            payload = {
+                "topic": msg["topic"],
+                "partition": msg["partition"],
+                "offset": msg["offset"],
+                "key": msg["key"],
+                "value": msg["value"],
+                "timestamp": msg["timestamp"]
+            }
+            logger.info("Received ", str(payload))
 

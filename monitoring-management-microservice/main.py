@@ -10,7 +10,7 @@ from config import get_config
 from db.common import get_database, db
 from api.endpoint import endpoint
 from utils.logger import logger_config
-from utils.kafka_consumer import get_consumer, consume
+from utils.kafka_consumer import consumer, consume
 
 from datetime import datetime
 
@@ -24,8 +24,6 @@ app = FastAPI(
     description=settings.DESCRIPTION,
     docs_url="/docs"
 )
-
-consumer = get_consumer()
 
 fast_mqtt.init_app(app)
 
