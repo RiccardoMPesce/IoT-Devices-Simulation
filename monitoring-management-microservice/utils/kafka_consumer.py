@@ -8,16 +8,13 @@ logger = logger_config(__name__)
 
 configs = get_config()
 
-def get_device_consumer() -> AIOKafkaConsumer:
-    return AIOKafkaConsumer(
-        configs.KAFKA_TOPIC_DEVICES,
+async def device_consume():
+    device_consumer = AIOKafkaConsumer(
+        *configs.KAFKA_TOPIC_DEVICES,
         bootstrap_servers=configs.KAFKA_INSTANCE
     )
-
-async def consume():
-    device_consumer = get_device_consumer()
     await device_consumer.start()
-    while True:
+    try:
         async for msg in device_consumer:
             payload = {
                 "topic": msg["topic"],
@@ -28,4 +25,6 @@ async def consume():
                 "timestamp": msg["timestamp"]
             }
             logger.info("Received ", str(payload))
+    finally:
+        await device_consumer.stop()
 

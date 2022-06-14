@@ -1,5 +1,6 @@
 # Used to run the server
 import uvicorn
+import asyncio
 
 from fastapi import FastAPI
 
@@ -10,7 +11,7 @@ from config import get_config
 from db.common import get_database, db
 from api.endpoint import endpoint
 from utils.logger import logger_config
-from utils.kafka_consumer import consume
+from utils.kafka_consumer import device_consume
 
 from datetime import datetime
 
@@ -39,19 +40,19 @@ app.add_route("/metrics", handle_metrics)
 
 logger.info("API launched for " + settings.ENVIRONMENT + " environment")
 
-# Connecting to the datatabase
+# Connecting to the datatabase and running kafka
 @app.on_event("startup")
 async def startup():
     logger.info("Connecting to the database")
     await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
-    await consume()
+    # asyncio.run(device_consume())
+    await device_consume()
 
 # Disconnecting from the database
 @app.on_event("shutdown")
 async def startup():
     logger.info("Connecting to the database")
     await db.close_database_connection()
-    await consumer.stop()
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
