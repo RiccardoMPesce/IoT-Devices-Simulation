@@ -37,8 +37,10 @@ class Settings(BaseSettings):
     DB_URI = database_uri()
     KAFKA_HOST: str = os.getenv("KAFKA_HOST", "kafka")
     KAFKA_PORT: str = os.getenv("KAFKA_PORT", "9092")
-    KAFKA_TOPIC_DEVICES: str = os.getenv("KAFKA_TOPICS", "devices")
+    KAFKA_PORT_EXTERNAL: str = os.getenv("KAFKA_PORT_EXTERNAL", "9093")
+    KAFKA_TOPICS: str = os.getenv("KAFKA_TOPICS", "measure_recordings")
     KAFKA_INSTANCE = f"{KAFKA_HOST}:{KAFKA_PORT}"
+    KAFKA_INSTANCE_LOCALHOST = f"localhost:{KAFKA_PORT}"
 
     class Config:
         case_sensitive = True

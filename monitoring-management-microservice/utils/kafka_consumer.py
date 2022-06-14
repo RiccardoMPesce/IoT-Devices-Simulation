@@ -8,14 +8,19 @@ logger = logger_config(__name__)
 
 configs = get_config()
 
-async def device_consume():
-    device_consumer = AIOKafkaConsumer(
-        *configs.KAFKA_TOPIC_DEVICES,
-        bootstrap_servers=configs.KAFKA_INSTANCE
+async def consume():
+    topics_to_subscribe = configs.KAFKA_TOPICS.split(",")
+    bootstrap_servers = bootstrap_servers=configs.KAFKA_INSTANCE.split(",")
+    logger.info(f"Bootstrapping from servers {bootstrap_servers}")
+    logger.info(f"Subscribing to topics {topics_to_subscribe}")
+    consumer = AIOKafkaConsumer(
+        *topics_to_subscribe,
+        bootstrap_servers=configs.KAFKA_INSTANCE.split(",")
     )
-    await device_consumer.start()
+    logger.info(f"Consumer creation succeeded, now listening for new messages")
+    await consumer.start()
     try:
-        async for msg in device_consumer:
+        async for msg in consumer:
             payload = {
                 "topic": msg["topic"],
                 "partition": msg["partition"],
@@ -25,6 +30,8 @@ async def device_consume():
                 "timestamp": msg["timestamp"]
             }
             logger.info("Received ", str(payload))
+    except Exception as exception:
+        logger.info(f"Exception '{exception}' occurred")
     finally:
-        await device_consumer.stop()
+        await consumer.stop()
 

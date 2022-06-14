@@ -11,7 +11,7 @@ from config import get_config
 from db.common import get_database, db
 from api.endpoint import endpoint
 from utils.logger import logger_config
-from utils.kafka_consumer import device_consume
+from utils.kafka_consumer import consume
 
 from datetime import datetime
 
@@ -45,8 +45,7 @@ logger.info("API launched for " + settings.ENVIRONMENT + " environment")
 async def startup():
     logger.info("Connecting to the database")
     await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
-    # asyncio.run(device_consume())
-    await device_consume()
+    await consume()
 
 # Disconnecting from the database
 @app.on_event("shutdown")
@@ -55,4 +54,4 @@ async def startup():
     await db.close_database_connection()
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
