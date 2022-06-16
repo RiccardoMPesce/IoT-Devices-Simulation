@@ -131,3 +131,4 @@ dmypy.json
 # Docker
 mongodb_data/
 data/
+kafka-persistence/
