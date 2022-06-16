@@ -29,6 +29,7 @@ services:
     image: obsidiandynamics/kafdrop
     depends_on: 
       - kafka 
+      - zookeeper
     ports:
       - 9000:9000
     environment:
@@ -120,6 +121,7 @@ services:
     depends_on:
       - mongodb
       - kafka
+      - zookeeper
     ports:
       - 8000:8000
 

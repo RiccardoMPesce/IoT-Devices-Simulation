@@ -10,12 +10,12 @@ configs = get_config()
 
 async def consume():
     topics_to_subscribe = configs.KAFKA_TOPICS.split(",")
-    bootstrap_servers = bootstrap_servers=configs.KAFKA_INSTANCE.split(",")
+    bootstrap_servers = configs.KAFKA_INSTANCE.split(",")
     logger.info(f"Bootstrapping from servers {bootstrap_servers}")
     logger.info(f"Subscribing to topics {topics_to_subscribe}")
     consumer = AIOKafkaConsumer(
         *topics_to_subscribe,
-        bootstrap_servers=configs.KAFKA_INSTANCE.split(",")
+        bootstrap_servers=bootstrap_servers
     )
     logger.info(f"Consumer creation succeeded, now listening for new messages")
     await consumer.start()
