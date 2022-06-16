@@ -57,9 +57,6 @@ services:
       kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic measure_recordings --replication-factor 1 --partitions 1
       kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic device_commands --replication-factor 1 --partitions 1
 
-      echo -e 'Generating a mock message'
-      /opt/bitnami/kafka/bin/kafka-console-producer.sh --broker-list kafka:9092 --producer.config /opt/bitnami/kafka/config/producer.properties --topic test
-
       echo -e 'Successfully created the following topics:'
       kafka-topics.sh --bootstrap-server kafka:9092 --list
       "
