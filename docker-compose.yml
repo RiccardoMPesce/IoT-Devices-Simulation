@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.8"
 
 services:
   zookeeper:
@@ -34,16 +34,6 @@ services:
       - 9000:9000
     environment:
       - KAFKA_BROKERCONNECT=kafka:9092
-  # kafka-ui:
-  #   image: provectuslabs/kafka-ui
-  #   container_name: kafka-ui
-  #   ports:
-  #     - "8080:8080"
-  #   restart: always
-  #   environment:
-  #     - KAFKA_CLUSTERS_0_NAME=local
-  #     - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-  #     - KAFKA_CLUSTERS_0_ZOOKEEPER=localhost:2181
   kafka-init:
     image: bitnami/kafka 
     depends_on:
@@ -52,8 +42,8 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     environment:
       - KAFKA_BROKER_ID=1
-    volumes:
-      - ./kafka-persistence:/bitnami/kafka
+    # volumes:
+    #   - ./kafka-persistence:/bitnami/kafka
     command: |
       "
       kafka-topics.sh --bootstrap-server kafka:9092 --list
@@ -119,9 +109,10 @@ services:
       - ./monitoring-management-microservice/:/app/monitoring-management-microservice/
     env_file: .env
     depends_on:
-      - mongodb
-      - kafka
-      - zookeeper
+      mongodb:
+        condition: service_started
+      kafka-init:
+        condition: service_completed_successfully
     ports:
-      - 8000:8000
+      - 8080:8080
 

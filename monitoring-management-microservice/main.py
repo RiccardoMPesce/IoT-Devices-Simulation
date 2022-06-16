@@ -49,9 +49,9 @@ async def startup():
 
 # Disconnecting from the database
 @app.on_event("shutdown")
-async def startup():
+async def shutdown():
     logger.info("Connecting to the database")
     await db.close_database_connection()
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True, workers=2)
