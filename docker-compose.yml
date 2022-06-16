@@ -22,32 +22,37 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-    restart: always
-    volumes:
-      - ./kafka-persistence:/bitnami/kafka
-  # kafdrop:
-  #   image: obsidiandynamics/kafdrop
-  #   depends_on: 
-  #     - kafka 
-  #   ports:
-  #     - 9000:9000
-  #   environment:
-  #     - KAFKA_BROKERCONNECT=kafka:9092
-  kafka-ui:
-    image: provectuslabs/kafka-ui
-    container_name: kafka-ui
+    # restart: always
+    # volumes:
+    #   - ./kafka-persistence:/bitnami/kafka
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    depends_on: 
+      - kafka 
     ports:
-      - "8080:8080"
-    restart: always
+      - 9000:9000
     environment:
-      - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-      - KAFKA_CLUSTERS_0_ZOOKEEPER=localhost:2181
+      - KAFKA_BROKERCONNECT=kafka:9092
+  # kafka-ui:
+  #   image: provectuslabs/kafka-ui
+  #   container_name: kafka-ui
+  #   ports:
+  #     - "8080:8080"
+  #   restart: always
+  #   environment:
+  #     - KAFKA_CLUSTERS_0_NAME=local
+  #     - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+  #     - KAFKA_CLUSTERS_0_ZOOKEEPER=localhost:2181
   kafka-init:
     image: bitnami/kafka 
     depends_on:
       - kafka 
+      - zookeeper
     entrypoint: ["/bin/sh", "-c"]
+    environment:
+      - KAFKA_BROKER_ID=1
+    volumes:
+      - ./kafka-persistence:/bitnami/kafka
     command: |
       "
       kafka-topics.sh --bootstrap-server kafka:9092 --list
@@ -56,6 +61,7 @@ services:
       kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic test --replication-factor 1 --partitions 1
       kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic measure_recordings --replication-factor 1 --partitions 1
       kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic device_commands --replication-factor 1 --partitions 1
+      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic sensor_metrics --replication-factor 1 --partitions 1
 
       echo -e 'Successfully created the following topics:'
       kafka-topics.sh --bootstrap-server kafka:9092 --list
@@ -78,7 +84,7 @@ services:
   mongo-express:
     container_name: mongo-express
     image: mongo-express
-    restart: always
+    # restart: always
     depends_on:
       - mongodb
     environment:
@@ -97,7 +103,7 @@ services:
     build: ./monitoring-management-microservice
     command: python main.py
     container_name: monitoring-management-microservice
-    restart: always
+    # restart: always
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DB_USERNAME=${MONGO_USER}
@@ -113,6 +119,7 @@ services:
     env_file: .env
     depends_on:
       - mongodb
+      - kafka
     ports:
       - 8000:8000
 
