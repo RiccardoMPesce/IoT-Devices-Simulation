@@ -30,6 +30,7 @@ async def get_all_devices_in_database(db: DatabaseManager = Depends(get_database
     Get all devices from devices mongodb collection
     """
     devices = await db.device_get_all()
+    logger.info(str(devices))
     if devices:
         return JSONResponse(status_code=status.HTTP_200_OK, content=devices)
     raise HTTPException(
