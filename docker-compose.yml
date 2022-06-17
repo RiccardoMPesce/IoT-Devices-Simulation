@@ -91,10 +91,12 @@ services:
     volumes: 
       - ./mongodb_data/:/data/db/
   monitoring-management-microservice:
-    build: ./monitoring-management-microservice
-    command: python main.py
+    build: 
+      context: ./monitoring-management-microservice
+      dockerfile: Dockerfile
+    # command: python main.py
     container_name: monitoring-management-microservice
-    # restart: always
+    restart: always
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DB_USERNAME=${MONGO_USER}
@@ -114,5 +116,5 @@ services:
       kafka-init:
         condition: service_completed_successfully
     ports:
-      - 8080:8080
+      - 8000:8080
 
