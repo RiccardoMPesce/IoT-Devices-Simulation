@@ -1,7 +1,7 @@
-# Used to run the server
-import uvicorn
-
 from fastapi import FastAPI
+
+# CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 # Used to add Prometheus support
 from starlette_exporter import PrometheusMiddleware, handle_metrics
@@ -27,24 +27,6 @@ app = FastAPI(
 # MQTT
 fast_mqtt.init_app(app)
 
-@fast_mqtt.on_connect()
-def mqtt_connect(client, flags, rc, properties):
-    # Later for subscription
-    logger.info("Connected: ", str(client), str(flags), str(rc), str(properties))
-
-@fast_mqtt.on_message()
-async def message(client, topic, payload, qos, properties):
-    print(str(client), " eceived message: ", str(topic), str(payload.decode()), str(qos), str(properties))
-    return 0
-
-@fast_mqtt.on_disconnect()
-def disconnect(client, packet, exc=None):
-    print("Disconnected")
-
-@fast_mqtt.on_subscribe()
-def subscribe(client, mid, qos, properties):
-    print("subscribed", client, mid, qos, properties)
-
 # Including routes
 app.include_router(endpoint)
 
@@ -55,6 +37,15 @@ logger = logger_config(__name__)
 # Add Prometheus
 app.add_middleware(PrometheusMiddleware)
 app.add_route("/metrics", handle_metrics)
+
+# Add CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 logger.info("API launched for " + settings.ENVIRONMENT + " environment")
 
@@ -99,17 +90,3 @@ async def shutdown():
     logger.info("Discconnecting to the database")
     await db.close_database_connection()
 
-if __name__ == "__main__":
-    host = "0.0.0.0"
-    port = 8000
-    reload = True
-    num_workers = 2
-    
-    logger.info(f"Running app {settings.PROJECT_NAME} on {host}:{port}")
-    if reload:
-        logger.info("Reload is enabled")
-    else:
-        logger.info("Reload is disabled")
-    logger.info(f"Number of workers: {num_workers}")
-
-    uvicorn.run("main:app", host=host, port=port, reload=reload, workers=num_workers)

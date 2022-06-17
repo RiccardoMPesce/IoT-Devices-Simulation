@@ -2,29 +2,28 @@ version: "3.8"
 
 services:
   zookeeper:
-    image: bitnami/zookeeper
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
     ports:
       - 2181:2181
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+    restart: always
   kafka:
-    image: bitnami/kafka
-    depends_on:
-      - zookeeper
+    image: wurstmeister/kafka
+    container_name: kafka
     ports:
       - 9092:9092
       - 9093:9093
     environment:
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-    # restart: always
-    # volumes:
-    #   - ./kafka-persistence:/bitnami/kafka
+      KAFKA_ADVERTISED_HOST_NAME: kafka:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "test:1:1,measure_recordings:1:1,device_commands:1:1,sensors_metrics:1:1"
+      KAFKA_LISTENERS: "INTERNAL://:9092,EXTERNAL://:9093"
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - zookeeper
+    restart: always
   kafdrop:
     image: obsidiandynamics/kafdrop
     depends_on: 
@@ -33,30 +32,8 @@ services:
     ports:
       - 9000:9000
     environment:
-      - KAFKA_BROKERCONNECT=kafka:9092
-  kafka-init:
-    image: bitnami/kafka 
-    depends_on:
-      - kafka 
-      - zookeeper
-    entrypoint: ["/bin/sh", "-c"]
-    environment:
-      - KAFKA_BROKER_ID=1
-    # volumes:
-    #   - ./kafka-persistence:/bitnami/kafka
-    command: |
-      "
-      kafka-topics.sh --bootstrap-server kafka:9092 --list
-
-      echo -e 'Creating kafka topics'
-      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic test --replication-factor 1 --partitions 1
-      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic measure_recordings --replication-factor 1 --partitions 1
-      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic device_commands --replication-factor 1 --partitions 1
-      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic sensor_metrics --replication-factor 1 --partitions 1
-
-      echo -e 'Successfully created the following topics:'
-      kafka-topics.sh --bootstrap-server kafka:9092 --list
-      "
+      KAFKA_BROKERCONNECT: kafka:9092
+    restart: always
   mongodb:
     image: mongo
     container_name: mongodb
@@ -75,7 +52,7 @@ services:
   mongo-express:
     container_name: mongo-express
     image: mongo-express
-    # restart: always
+    restart: always
     depends_on:
       - mongodb
     environment:
@@ -111,10 +88,7 @@ services:
       - ./monitoring-management-microservice/:/app/monitoring-management-microservice/
     env_file: .env
     depends_on:
-      mongodb:
-        condition: service_started
-      kafka-init:
-        condition: service_completed_successfully
+      - kafka 
+      - mongodb
     ports:
-      - 8000:8080
-
+      - 8000:8000
