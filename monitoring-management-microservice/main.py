@@ -82,7 +82,7 @@ async def consume():
 async def startup():
     logger.info("Connecting to the database")
     await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
-    # await consume()
+    await consume()
 
 # Disconnecting from the database
 @app.on_event("shutdown")

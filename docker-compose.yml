@@ -4,31 +4,42 @@ services:
   zookeeper:
     image: wurstmeister/zookeeper
     container_name: zookeeper
+    hostname: zookeeper
     ports:
       - 2181:2181
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+      ZOO_SERVERS: server.1=zookeeper:2888:3888
+    volumes:
+      - ./data/zookeeper/data:/data
+      - ./data/zookeeper/datalog:/datalog
     restart: always
   kafka:
     image: wurstmeister/kafka
     container_name: kafka
+    hostname: kafka
     ports:
       - 9092:9092
       - 9093:9093
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "test:1:1,measure_recordings:1:1,device_commands:1:1,sensors_metrics:1:1"
-      KAFKA_LISTENERS: "INTERNAL://:9092,EXTERNAL://:9093"
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:9092,LISTENER_DOCKER_EXTERNAL://localhost:9093
+      KAFKA_LISTENERS: LISTENER_DOCKER_INTERNAL://:9092,LISTENER_DOCKER_EXTERNAL://:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
     restart: always
   kafdrop:
     image: obsidiandynamics/kafdrop
+    volumes:
+      - ./data/kafka/data:/var/lib/kafka/data
     depends_on: 
       - kafka 
-      - zookeeper
     ports:
       - 9000:9000
     environment:
@@ -47,7 +58,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
       - MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
     volumes:
-      - ./mongodb_data/:/data/db/
+      - ./data/mongodb/:/data/db/
       - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
   mongo-express:
     container_name: mongo-express
@@ -66,7 +77,7 @@ services:
     ports:
       - 8081:8081
     volumes: 
-      - ./mongodb_data/:/data/db/
+      - ./data/mongodb/:/data/db/
   monitoring-management-microservice:
     build: 
       context: ./monitoring-management-microservice
