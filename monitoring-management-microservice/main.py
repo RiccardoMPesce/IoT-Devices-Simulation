@@ -5,12 +5,11 @@ from fastapi import FastAPI
 # Used to add Prometheus support
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 
-from config import get_config
+from utils.config import get_config
 from db.common import db
 from api.endpoint import endpoint
 from utils.logger import logger_config
-
-from api.simulation_api import fast_mqtt
+from utils.mqtt import fast_mqtt
 
 settings = get_config()
 
@@ -18,7 +17,7 @@ logger = logger_config(__name__)
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION, description=settings.DESCRIPTION)
 
-# MQTT
+# Init MQTT
 fast_mqtt.init_app(app)
 
 # Including routes

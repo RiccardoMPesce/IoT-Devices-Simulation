@@ -6,23 +6,11 @@ from typing import Union
 from datetime import datetime
 
 from db.common import get_database, DatabaseManager
-
-from api.device_api import router as device_router
+from utils.mqtt import fast_mqtt
 
 from utils.logger import logger_config
 
-from fastapi_mqtt.config import MQTTConfig
-from fastapi_mqtt.fastmqtt import FastMQTT
-
 logger = logger_config(__name__)
-
-mqtt_config = MQTTConfig(
-    host="broker.hivemq.com"
-)
-
-fast_mqtt = FastMQTT(
-    config=mqtt_config
-)
 
 TOPIC_PREFIX = "rmp/dsbd202122/"
 
