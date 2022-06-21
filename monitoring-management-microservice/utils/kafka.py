@@ -1,2 +1,0 @@
-from aiokafka import AIOKafkaConsumer
-

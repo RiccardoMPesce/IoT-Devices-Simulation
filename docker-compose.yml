@@ -78,28 +78,4 @@ services:
       - 8081:8081
     volumes: 
       - ./data/mongodb/:/data/db/
-  monitoring-management-microservice:
-    build: 
-      context: ./monitoring-management-microservice
-      dockerfile: Dockerfile
-    command: python main.py
-    # command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
-    container_name: monitoring-management-microservice
-    restart: always
-    environment:
-      - ENVIRONMENT=${ENVIRONMENT}
-      - DB_USERNAME=${MONGO_USER}
-      - DB_PASSWORD=${MONGO_PASSWORD}
-      - DB_HOST=${MONGO_HOST}
-      - DB_PORT=${MONGO_PORT}
-      - DB_NAME=${MONGO_DB}
-      - KAFKA_HOST=${KAFKA_HOST}
-      - KAFKA_PORT=${KAFKA_PORT}
-      - KAFKA_TOPICS=${KAFKA_TOPICS}
-    volumes:
-      - ./monitoring-management-microservice/:/app/monitoring-management-microservice/
-    env_file: .env
-    depends_on:
-      - kafka
-    ports:
-      - 8000:8000
+  
