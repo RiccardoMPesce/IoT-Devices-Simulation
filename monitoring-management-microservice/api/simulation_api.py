@@ -6,19 +6,21 @@ from typing import Union
 from datetime import datetime
 
 from db.common import get_database, DatabaseManager
+
 from utils.mqtt import fast_mqtt
+from utils.config import get_config
 
 from utils.logger import logger_config
 
 logger = logger_config(__name__)
 
-TOPIC_PREFIX = "rmp/dsbd202122/"
+settings = get_config()
 
 router = APIRouter(prefix="/simulate")
 
 @fast_mqtt.on_connect()
 def connect(client, flags, rc, properties):
-    fast_mqtt.client.subscribe(TOPIC_PREFIX)
+    fast_mqtt.client.subscribe(settings.MQTT_TOPIC_PREFIX)
     print("Connected: ", client, flags, rc, properties)
 
 
@@ -44,7 +46,7 @@ async def simulate_recording(device_id: str,
             "health": health,
             "timestamp": datetime.utcnow().timestamp()
         }
-        topic = TOPIC_PREFIX + device.get("measure") + "/" + device_id
+        topic = settings.MQTT_TOPIC_PREFIX + device.get("measure") + "/" + device_id
         fast_mqtt.publish(
             topic, 
             payload=measure, 
