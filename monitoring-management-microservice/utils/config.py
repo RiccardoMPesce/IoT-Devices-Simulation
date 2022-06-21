@@ -1,5 +1,7 @@
 import os
 import secrets
+import asyncio
+
 from functools import lru_cache
 
 from pydantic import BaseSettings
@@ -41,7 +43,7 @@ class Settings(BaseSettings):
     KAFKA_TOPICS: str = os.getenv("KAFKA_TOPICS", "measure_recordings")
     KAFKA_INSTANCE = f"{KAFKA_HOST}:{KAFKA_PORT}"
     KAFKA_INSTANCE_LOCALHOST = f"localhost:{KAFKA_PORT_EXTERNAL}"
-    KAFKA_CONSUMER_GROUP="mmms"
+    KAFKA_CONSUMER_GROUP=PROJECT_NAME.lower().replace("-microservice", "")
 
     class Config:
         case_sensitive = True

@@ -1,4 +1,5 @@
 import uvicorn
+import asyncio
 
 from fastapi import FastAPI
 
@@ -10,6 +11,7 @@ from db.common import db
 from api.endpoint import endpoint
 from utils.logger import logger_config
 from utils.mqtt import fast_mqtt
+from utils.kafka import kafka_init, consume
 
 settings = get_config()
 
@@ -34,11 +36,13 @@ logger.info("API launched for " + settings.ENVIRONMENT + " environment")
 async def startup():
     logger.info("Application startup")
     await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
+    asyncio.create_task(kafka_init())
+    asyncio.create_task(consume())
 
 # Shutdown event routine
 @app.on_event("shutdown")
 async def shutdown():
-    logger.info("Discconnecting to the database")
+    logger.info("Application shutdown")
     await db.close_database_connection()
 
 if __name__ == "__main__":
