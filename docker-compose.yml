@@ -107,3 +107,24 @@ services:
       - kafka
     ports:
       - 8000:8000
+  recording-microservice:
+    build: 
+      context: ./recording-microservice
+      dockerfile: Dockerfile
+    # command: python main.py
+    # command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+    # command: sh -c "./wait-for.sh kafka:9092 --timeout 60 -- python main.py"
+    container_name: recording-microservice
+    restart: always
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - KAFKA_HOST=${KAFKA_HOST}
+      - KAFKA_PORT=${KAFKA_PORT}
+      - KAFKA_TOPICS=${KAFKA_TOPICS}
+    volumes:
+      - ./recording-microservice/:/app/recording-microservice/
+    env_file: .env
+    depends_on:
+      - kafka
+    ports:
+      - 8001:8001
