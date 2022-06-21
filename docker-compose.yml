@@ -36,6 +36,7 @@ services:
     restart: always
   kafdrop:
     image: obsidiandynamics/kafdrop
+    container_name: kafdrop
     volumes:
       - ./data/kafka/data:/var/lib/kafka/data
     depends_on: 
