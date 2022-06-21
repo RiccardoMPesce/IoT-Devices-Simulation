@@ -1,6 +1,5 @@
 import os
 import secrets
-import asyncio
 
 from functools import lru_cache
 

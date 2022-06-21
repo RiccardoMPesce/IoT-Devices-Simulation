@@ -10,8 +10,7 @@ services:
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
     volumes:
-      - ./data/zookeeper/data:/data
-      - ./data/zookeeper/datalog:/datalog
+      - ./data/zookeeper:/data/zookeeper
     restart: always
   kafka:
     image: bitnami/kafka
@@ -23,30 +22,31 @@ services:
       - 9093
     environment:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CREATE_TOPICS="test:1:1,measure_recordings:1:1,device_commands:1:1,sensor_metrics:1:1"
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      # - KAFKA_CREATE_TOPICS="test:1:1,measure_recordings:1:1,device_commands:1:1,sensor_metrics:1:1"
+      # - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
       - KAFKA_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
       - KAFKA_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
       - KAFKA_BROKER_ID=1
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
     restart: always
+    volumes:
+      - ./data/kafka:/data/kafka
   kafdrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
-    volumes:
-      - ./data/kafka/data:/var/lib/kafka/data
+    # volumes:
+    #   - ./data/kafka/data:/var/lib/kafka/data
     depends_on: 
-      - kafka 
+      - kafka
     ports:
       - 9000:9000
     environment:
       KAFKA_BROKERCONNECT: "kafka:9092"
-      # JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
     restart: always
   mongodb:
     image: mongo
@@ -85,8 +85,9 @@ services:
     build: 
       context: ./monitoring-management-microservice
       dockerfile: Dockerfile
-    command: python main.py
+    # command: python main.py
     # command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+    command: sh -c "./wait-for.sh kafka:9092 --timeout 60 -- python main.py"
     container_name: monitoring-management-microservice
     restart: always
     environment:

@@ -18,8 +18,8 @@ async def consume():
     consumer = AIOKafkaConsumer(
         *kafka_topics, 
         loop=loop,
-        bootstrap_servers=settings.KAFKA_INSTANCE, 
-        group_id=settings.KAFKA_CONSUMER_GROUP
+        bootstrap_servers=settings.KAFKA_INSTANCE 
+        # group_id=settings.KAFKA_CONSUMER_GROUP
     )
     await consumer.start()
     try:
