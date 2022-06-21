@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     KAFKA_TOPICS: str = os.getenv("KAFKA_TOPICS", "measure_recordings")
     KAFKA_INSTANCE = f"{KAFKA_HOST}:{KAFKA_PORT}"
     KAFKA_INSTANCE_LOCALHOST = f"localhost:{KAFKA_PORT_EXTERNAL}"
+    KAFKA_CONSUMER_GROUP="mmms"
 
     class Config:
         case_sensitive = True
