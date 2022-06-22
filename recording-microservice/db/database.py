@@ -8,13 +8,11 @@ from datetime import datetime
 
 settings = get_config()
 
+database = databases.Database(settings.DB_URI)
+metadata = sqlalchemy.MetaData()
 class BaseMeta(ormar.ModelMeta):
     metadata = metadata
     database = database
 
-
-database = databases.Database(settings.db_url)
-metadata = sqlalchemy.MetaData()
-
-engine = sqlalchemy.create_engine(settings.db_url)
+engine = sqlalchemy.create_engine(settings.DB_URI)
 metadata.create_all(engine)
