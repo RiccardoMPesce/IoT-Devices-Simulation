@@ -11,4 +11,4 @@ aiokafka
 sqlalchemy
 ormar
 asyncpg
-psycopg2-binary
+psycopg2
