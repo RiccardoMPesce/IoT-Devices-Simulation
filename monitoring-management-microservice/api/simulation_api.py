@@ -18,12 +18,6 @@ settings = get_config()
 
 router = APIRouter(prefix="/simulate")
 
-@fast_mqtt.on_connect()
-def connect(client, flags, rc, properties):
-    fast_mqtt.client.subscribe(settings.MQTT_TOPIC_PREFIX)
-    print("Connected: ", client, flags, rc, properties)
-
-
 @router.put(
     "",
     responses={

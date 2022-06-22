@@ -29,9 +29,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Init MQTT
-fast_mqtt.init_app(app)
-
 # Including routes
 app.include_router(endpoint)
 
@@ -45,6 +42,7 @@ logger.info("API launched for " + settings.ENVIRONMENT + " environment")
 @app.on_event("startup")
 async def startup():
     logger.info("Application startup")
+    fast_mqtt.init_app(app)
     await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
     asyncio.create_task(kafka_init())
     asyncio.create_task(consume())

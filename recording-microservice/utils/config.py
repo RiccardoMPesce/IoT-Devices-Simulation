@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     KAFKA_INSTANCE_LOCALHOST = f"localhost:{KAFKA_PORT_EXTERNAL}"
     KAFKA_CONSUMER_GROUP = PROJECT_NAME.lower().replace("-microservice", "")
     MQTT_BROKER_HOST = os.getenv("MQTT_BROKER_HOST", "broker.hivemq.com")
+    MQTT_BROKER_PORT = os.getenv("MQTT_BROKER_PORT", 1883)
     MQTT_TOPIC_PREFIX = os.getenv("MQTT_TOPIC_PREFIX", "rmp/dsbd202122/")
 
     class Config:
