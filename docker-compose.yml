@@ -151,3 +151,10 @@ services:
       - kafka
     ports:
       - 8001:8001
+  mosquitto:
+    image: eclipse-mosquitto
+    volumes:
+      - ./data/mosquitto/:/data/mosquitto/
+    ports:
+      - 1883:1883
+      - 9001:9001
