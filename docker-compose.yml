@@ -153,8 +153,12 @@ services:
       - 8001:8001
   mosquitto:
     image: eclipse-mosquitto
+    container_name: mosquitto
+    restart: always
     volumes:
-      - ./data/mosquitto/:/data/mosquitto/
+      - ./data/mosquitto/config:/data/mosquitto/config
+      - ./data/mosquitto/data:/data/mosquitto/data
+      - ./data/mosquitto/log:/data/mosquitto/log
     ports:
       - 1883:1883
       - 9001:9001
