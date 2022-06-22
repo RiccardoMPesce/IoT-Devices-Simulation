@@ -132,3 +132,4 @@ dmypy.json
 mongodb_data/
 data/
 kafka-persistence/
+mosquitto/
