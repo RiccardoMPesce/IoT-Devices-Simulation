@@ -3,6 +3,8 @@ import asyncio
 
 from fastapi import FastAPI
 
+from fastapi.middleware.cors import CORSMiddleware
+
 # Used to add Prometheus support
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 
@@ -18,6 +20,14 @@ settings = get_config()
 logger = logger_config(__name__)
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION, description=settings.DESCRIPTION)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Init MQTT
 fast_mqtt.init_app(app)
