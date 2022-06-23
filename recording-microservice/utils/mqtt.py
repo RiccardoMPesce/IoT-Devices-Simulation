@@ -1,5 +1,8 @@
+import json
+
 from utils.config import get_config
 from utils.logger import logger_config
+from utils.kafka import send_recording
 from db.database import database, Record
 
 from fastapi_mqtt.config import MQTTConfig
@@ -30,4 +33,6 @@ async def handle_measure(payload: dict):
     )
     await record.save()
     logger.info(f"Payload {payload} saved into database")
+    await send_recording(payload)
+    logger.info(f"Payload {payload} sent through kafka")
     return record

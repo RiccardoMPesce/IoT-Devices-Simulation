@@ -36,8 +36,8 @@ async def consume():
         await consumer.stop()
 
 
-async def kafka_init():
-    kafka_topics = settings.KAFKA_TOPICS.split(",") 
+async def send_recording(recording: dict):
+    kafka_topic = "measure_recordings"
 
     loop = asyncio.get_event_loop()
 
@@ -46,11 +46,11 @@ async def kafka_init():
         bootstrap_servers=settings.KAFKA_INSTANCE
     )
     await producer.start()
+
+    payload = json.dumps(recording).encode("utf-8")
+    
     try:
-        for topic in kafka_topics:
-            logger.info(f"Creating topic {topic} with test data")
-            value_json = json.dumps({topic: "recording-microservice up"}).encode("utf-8")
-            await producer.send_and_wait(topic=topic, value=value_json)
+        await producer.send(topic=kafka_topic, value=payload)
     finally:
         await producer.stop()
 

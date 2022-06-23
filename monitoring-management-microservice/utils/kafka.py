@@ -29,7 +29,7 @@ async def consume():
                 "topic": msg.topic,
                 "partition": msg.partition,
                 "timestamp": msg.timestamp,
-                "payload": json.loads(msg.value)
+                "payload": json.loads(msg.value).decode("utf-8")
             }
             logger.info("Consumed " + str(packet["payload"]))
     finally:

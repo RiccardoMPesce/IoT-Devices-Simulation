@@ -11,7 +11,7 @@ from utils.logger import logger_config
 from api.endpoint import endpoint
 from db.database import database, Record
 from utils.mqtt import handle_measure
-from utils.kafka import kafka_init, consume
+from utils.kafka import consume
 
 
 logger = logger_config(__name__)
@@ -74,7 +74,6 @@ async def startup_event():
     database_ = app.state.database
     if not database_.is_connected:
         await database.connect()
-    asyncio.create_task(kafka_init())
     asyncio.create_task(consume())
         
 @app.on_event("shutdown")
