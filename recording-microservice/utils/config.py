@@ -13,9 +13,11 @@ def database_uri():
     DB_USER = os.getenv("POSTGRES_USERNAME", "admin")
     DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "ds&bd2021-2022")
     DB_NAME = os.getenv("POSTGRES_DB", "recordings")
+    DB_HOST = os.getenv("POSTGRES_HOST", "postgres")
+    DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 
     MONGODB_CLIENT_SETUP = (
-        f"postgresql://{DB_USER}:{DB_PASSWORD}@postgres:5432/{DB_NAME}"
+        f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     )
 
     return MONGODB_CLIENT_SETUP
