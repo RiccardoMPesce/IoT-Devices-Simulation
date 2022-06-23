@@ -1,5 +1,6 @@
 import uvicorn
 import asyncio
+import json 
 
 from fastapi import FastAPI
 
@@ -32,17 +33,48 @@ app.add_middleware(
 # Including routes
 app.include_router(endpoint)
 
+# MQTT
+fast_mqtt.init_app(app)
+
 # Add Prometheus
 app.add_middleware(PrometheusMiddleware)
 app.add_route("/metrics", handle_metrics)
 
 logger.info("API launched for " + settings.ENVIRONMENT + " environment")
 
+
+@fast_mqtt.on_connect()
+def connect(client, flags, rc, properties):
+    logger.info(f"Client {str(client)} connected to {settings.MQTT_BROKER_HOST}")
+    logger.info(f"Flags: {str(flags)}")
+    logger.info(f"RC: {str(rc)}")
+    logger.info(f"Properties: {str(properties)}")
+    logger.info(f"Now subscribing to measure related topics under {settings.MQTT_TOPIC_PREFIX}#")
+    fast_mqtt.client.subscribe(settings.MQTT_TOPIC_PREFIX + "#", qos=1)
+
+@fast_mqtt.on_message()
+async def message(client, topic, payload, qos, properties):
+    logger.info(f"Client {str(client)} received message from topic {topic} with QoS {qos}")
+    logger.info(f"Payload: {str(payload)}")
+    logger.info(f"Properties: {str(properties)}")
+    
+    return json.loads(payload)
+
+@fast_mqtt.on_disconnect()
+def disconnect(client, packet, exc=None):
+    logger.info(f"Client {client} disconnected")
+    logger.info(f"Packet: {packet}")
+
+@fast_mqtt.on_subscribe()
+def subscribe(client, mid, qos, properties):
+    logger.info(f"Client {client} subscribed with QoS {qos}")
+    logger.info(f"MID {mid}")
+    logger.info(f"Properties {properties}")
+
 # Startup event routine
 @app.on_event("startup")
 async def startup():
     logger.info("Application startup")
-    fast_mqtt.init_app(app)
     await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
     asyncio.create_task(kafka_init())
     asyncio.create_task(consume())
