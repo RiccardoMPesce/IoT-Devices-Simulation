@@ -29,9 +29,9 @@ async def consume():
                 "topic": msg.topic,
                 "partition": msg.partition,
                 "timestamp": msg.timestamp,
-                "payload": msg.value.decode("utf-8") 
+                "payload": json.loads(msg.value)
             }
-            logger.info("Consumed " + packet["payload"])
+            logger.info("Consumed " + str(packet["payload"]))
     finally:
         await consumer.stop()
 
@@ -49,7 +49,7 @@ async def kafka_init():
     try:
         for topic in kafka_topics:
             logger.info(f"Creating topic {topic} with test data")
-            value_json = json.dumps({topic: "up"}).encode("utf-8")
+            value_json = json.dumps({topic: "monitoring-management-microservice up"}).encode("utf-8")
             await producer.send_and_wait(topic=topic, value=value_json)
     finally:
         await producer.stop()

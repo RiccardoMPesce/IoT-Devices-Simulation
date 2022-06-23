@@ -28,9 +28,9 @@ class Settings(BaseSettings):
     App config settings
     """
 
-    PROJECT_NAME: str = "Monitoring-Management-Microservice"
+    PROJECT_NAME: str = "Recording-Microservice"
     VERSION: str = "1.0"
-    DESCRIPTION: str = "Simple app to monitor and manage IoT remote devices"
+    DESCRIPTION: str = "Simple app to record IoT sensors measures"
     SECRET_KET: str = secrets.token_urlsafe(32)
     DEBUG: bool = bool(os.getenv("DEBUG", "False"))
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "dev")
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     KAFKA_HOST: str = os.getenv("KAFKA_HOST", "kafka")
     KAFKA_PORT: str = os.getenv("KAFKA_PORT", "9092")
     KAFKA_PORT_EXTERNAL: str = os.getenv("KAFKA_PORT_EXTERNAL", "9093")
-    KAFKA_TOPICS: str = os.getenv("KAFKA_TOPICS", "measure_recordings")
+    KAFKA_TOPICS: str = os.getenv("RECORDING_MICROSERVICE_KAFKA_TOPICS", "measure_recordings,device_commands")
     KAFKA_INSTANCE = f"{KAFKA_HOST}:{KAFKA_PORT}"
     KAFKA_INSTANCE_LOCALHOST = f"localhost:{KAFKA_PORT_EXTERNAL}"
     KAFKA_CONSUMER_GROUP = PROJECT_NAME.lower().replace("-microservice", "")
