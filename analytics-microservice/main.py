@@ -29,12 +29,12 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    pass
+    logger.info("Testing clickhouse")
+    await test_clickhouse()
         
 @app.on_event("shutdown")
 async def shutdown_event():
-    logger.info("Testing clickhouse")
-    await test_clickhouse()
+    pass
     
 
 if __name__ == "__main__":
