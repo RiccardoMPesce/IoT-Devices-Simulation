@@ -153,6 +153,29 @@ services:
       - mosquitto
     ports:
       - 8001:8001
+  analytics-microservice:
+    build: 
+      context: ./analytics-microservice
+      dockerfile: Dockerfile
+    # command: python main.py
+    # command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+    command: sh -c "./wait-for.sh kafka:9092 --timeout 60 -- python main.py"
+    container_name: analytics-microservice
+    restart: always
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - KAFKA_HOST=${KAFKA_HOST}
+      - KAFKA_PORT=${KAFKA_PORT}
+      - KAFKA_TOPICS=${KAFKA_TOPICS}
+      - DATABASE_URL=$POSTGRES_URL
+    volumes:
+      - ./analytics-microservice/:/app/analytics-microservice/
+    env_file: .env
+    depends_on:
+      - kafka
+      - mosquitto
+    ports:
+      - 8002:8002
   mosquitto:
     image: eclipse-mosquitto
     container_name: mosquitto
@@ -165,3 +188,12 @@ services:
     ports:
       - 1883:1883
       - 9001:9001
+  clickhouse:
+    image: yandex/clickhouse-server
+    container_name: clickhouse
+    hostname: clickhouse
+    restart: always
+    ports:
+      - "8123:8123"
+    volumes:
+      - ./data/clickhouse:/var/lib/clickhouse

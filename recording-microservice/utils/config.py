@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     App config settings
     """
 
-    PROJECT_NAME: str = "Recording-Microservice"
+    PROJECT_NAME: str = os.getenv("PROJECT_NAME2", "Recording-Microservice")
     VERSION: str = "1.0"
     DESCRIPTION: str = "Simple app to record IoT sensors measures"
     SECRET_KET: str = secrets.token_urlsafe(32)

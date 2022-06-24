@@ -1,7 +1,6 @@
 fastapi
 pydantic
 uvicorn
-paho-mqtt
 pymongo
 motor
 starlette_exporter
