@@ -5,8 +5,11 @@ import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from db.database import test_clickhouse
+from utils.logger import logger_config
 
-# logger = logger_config(__name__)
+
+logger = logger_config(__name__)
 # settings = get_config()
 
 app = FastAPI()
@@ -30,7 +33,8 @@ async def startup_event():
         
 @app.on_event("shutdown")
 async def shutdown_event():
-    pass
+    logger.info("Testing clickhouse")
+    await test_clickhouse()
     
 
 if __name__ == "__main__":

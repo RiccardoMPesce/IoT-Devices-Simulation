@@ -3,5 +3,4 @@ pydantic
 uvicorn
 starlette_exporter
 starlette
-aiokafka
-asynch
+clickhouse-driver
