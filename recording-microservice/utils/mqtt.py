@@ -2,7 +2,7 @@ import json
 
 from utils.config import get_config
 from utils.logger import logger_config
-from utils.kafka import send_recording
+from utils.kafka import send_recording, send_command
 from db.database import database, Record
 
 from fastapi_mqtt.config import MQTTConfig
@@ -35,4 +35,13 @@ async def handle_measure(payload: dict):
     logger.info(f"Payload {payload} saved into database")
     await send_recording(payload)
     logger.info(f"Payload {payload} sent through kafka")
+
+    if not payload["health"]:
+        command = {
+            "device_id": payload["device_id"],
+            "status": False
+        }
+        logger.info(f"Shutting down unhealthy device with command {str(command)}")
+        await send_command(command)
+
     return record

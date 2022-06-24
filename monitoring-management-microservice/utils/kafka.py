@@ -5,6 +5,8 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 from utils.config import get_config
 from utils.logger import logger_config
+from db.common import db
+from models.device_schema import UpdateDevice
 
 settings = get_config()
 
@@ -31,7 +33,11 @@ async def consume():
                 "timestamp": msg.timestamp,
                 "payload": json.loads(msg.value)
             }
+            
             logger.info("Consumed " + str(packet["payload"]))
+            
+            if packet["topic"] == "device_commands" and "device_id" in packet["payload"]:
+                await handle_command(packet["payload"])
     finally:
         await consumer.stop()
 
@@ -53,3 +59,16 @@ async def kafka_init():
             await producer.send_and_wait(topic=topic, value=value_json)
     finally:
         await producer.stop()
+
+
+async def handle_command(command: dict) -> dict:
+    logger.info(str(command))
+    update_dict = {
+        "device_id": command["device_id"],
+        "status": command["status"]
+    }
+    payload = UpdateDevice.parse_obj(update_dict)
+    logger.info(f"Shutting down {str(update_dict)}")
+    await db.device_update_one(payload)
+    new_device = await db.device_get_one(update_dict["device_id"])
+    return new_device

@@ -54,3 +54,22 @@ async def send_recording(recording: dict):
     finally:
         await producer.stop()
 
+
+async def send_command(command: dict):
+    kafka_topic = "device_commands"
+
+    loop = asyncio.get_event_loop()
+
+    producer = AIOKafkaProducer(
+        loop=loop,
+        bootstrap_servers=settings.KAFKA_INSTANCE
+    )
+    await producer.start()
+
+    payload = json.dumps(command).encode("utf-8")
+    
+    try:
+        await producer.send(topic=kafka_topic, value=payload)
+    finally:
+        await producer.stop()
+
