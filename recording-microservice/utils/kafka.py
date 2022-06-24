@@ -5,8 +5,6 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 from utils.config import get_config
 from utils.logger import logger_config
-from db.common import db
-from models.device_schema import UpdateDevice
 
 settings = get_config()
 
@@ -33,17 +31,13 @@ async def consume():
                 "timestamp": msg.timestamp,
                 "payload": json.loads(msg.value)
             }
-            
             logger.info("Consumed " + str(packet["payload"]))
-            
-            if packet["topic"] == "device_commands" and "device_id" in packet["payload"]:
-                await handle_command(packet["payload"])
     finally:
         await consumer.stop()
 
 
-async def kafka_init():
-    kafka_topics = settings.KAFKA_TOPICS.split(",")
+async def send_recording(recording: dict):
+    kafka_topic = "measure_recordings"
 
     loop = asyncio.get_event_loop()
 
@@ -52,23 +46,30 @@ async def kafka_init():
         bootstrap_servers=settings.KAFKA_INSTANCE
     )
     await producer.start()
+
+    payload = json.dumps(recording).encode("utf-8")
+    
     try:
-        for topic in kafka_topics:
-            logger.info(f"Creating topic {topic} with test data")
-            value_json = json.dumps({topic: "monitoring-management-microservice up"}).encode("utf-8")
-            await producer.send_and_wait(topic=topic, value=value_json)
+        await producer.send(topic=kafka_topic, value=payload)
     finally:
         await producer.stop()
 
 
-async def handle_command(command: dict) -> dict:
-    logger.info(str(command))
-    update_dict = {
-        "device_id": command["device_id"],
-        "status": command["status"]
-    }
-    payload = UpdateDevice.parse_obj(update_dict)
-    logger.info(f"Shutting down {str(update_dict)}")
-    await db.device_update_one(payload)
-    new_device = await db.device_get_one(update_dict["device_id"])
-    return new_device
+async def send_command(command: dict):
+    kafka_topic = "device_commands"
+
+    loop = asyncio.get_event_loop()
+
+    producer = AIOKafkaProducer(
+        loop=loop,
+        bootstrap_servers=settings.KAFKA_INSTANCE
+    )
+    await producer.start()
+
+    payload = json.dumps(command).encode("utf-8")
+    
+    try:
+        await producer.send(topic=kafka_topic, value=payload)
+    finally:
+        await producer.stop()
+

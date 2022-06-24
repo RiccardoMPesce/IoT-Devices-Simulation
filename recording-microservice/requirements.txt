@@ -8,3 +8,7 @@ starlette_exporter
 starlette
 fastapi-mqtt
 aiokafka
+sqlalchemy
+ormar
+asyncpg
+psycopg2

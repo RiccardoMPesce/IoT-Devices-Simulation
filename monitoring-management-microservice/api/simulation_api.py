@@ -1,26 +1,20 @@
+import json
+
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from fastapi.responses import JSONResponse
-
-from pydantic import Field
 from typing import Union
 from datetime import datetime
 
 from db.common import get_database, DatabaseManager
 from utils.mqtt import fast_mqtt
-
+from utils.config import get_config
 from utils.logger import logger_config
 
 logger = logger_config(__name__)
 
-TOPIC_PREFIX = "rmp/dsbd202122/"
+settings = get_config()
 
 router = APIRouter(prefix="/simulate")
-
-@fast_mqtt.on_connect()
-def connect(client, flags, rc, properties):
-    fast_mqtt.client.subscribe(TOPIC_PREFIX)
-    print("Connected: ", client, flags, rc, properties)
-
 
 @router.put(
     "",
@@ -36,7 +30,7 @@ async def simulate_recording(device_id: str,
     
     device = await db.device_get_one(device_id=device_id)
 
-    if device:
+    if device and device["status"]:
         measure = {
             "device_id": device_id,
             "measure": device.get("measure"),
@@ -44,10 +38,10 @@ async def simulate_recording(device_id: str,
             "health": health,
             "timestamp": datetime.utcnow().timestamp()
         }
-        topic = TOPIC_PREFIX + device.get("measure") + "/" + device_id
-        fast_mqtt.publish(
+        topic = settings.MQTT_TOPIC_PREFIX + device.get("measure") + "/" + device_id
+        fast_mqtt.client.publish(
             topic, 
-            payload=measure, 
+            payload=json.dumps(measure), 
             qos=device.get("publish_qos")
         )
         return JSONResponse(status_code=status.HTTP_201_CREATED, content="Measure " + str(measure) + " pushed to topic " + topic)

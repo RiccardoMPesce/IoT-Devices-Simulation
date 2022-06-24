@@ -1,24 +1,21 @@
-import uvicorn
 import asyncio
-import json 
+import uvicorn
+import json
 
 from fastapi import FastAPI
-
 from fastapi.middleware.cors import CORSMiddleware
 
-# Used to add Prometheus support
-from starlette_exporter import PrometheusMiddleware, handle_metrics
-
-from utils.config import get_config
-from db.common import db
-from api.endpoint import endpoint
-from utils.logger import logger_config
 from utils.mqtt import fast_mqtt
-from utils.kafka import kafka_init, consume
+from utils.config import get_config
+from utils.logger import logger_config
+from api.endpoint import endpoint
+from db.database import database, Record
+from utils.mqtt import handle_measure
+from utils.kafka import consume
 
-settings = get_config()
 
 logger = logger_config(__name__)
+settings = get_config()
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION, description=settings.DESCRIPTION)
 
@@ -27,20 +24,15 @@ app.add_middleware(
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
-# Including routes
 app.include_router(endpoint)
 
-# MQTT
+# Init MQTT
 fast_mqtt.init_app(app)
 
-# Add Prometheus
-app.add_middleware(PrometheusMiddleware)
-app.add_route("/metrics", handle_metrics)
-
-logger.info("API launched for " + settings.ENVIRONMENT + " environment")
+app.state.database = database
 
 
 @fast_mqtt.on_connect()
@@ -58,7 +50,12 @@ async def message(client, topic, payload, qos, properties):
     logger.info(f"Payload: {str(payload)}")
     logger.info(f"Properties: {str(properties)}")
     
-    return json.loads(payload)
+    payload = json.loads(payload)
+    
+    if "measure" in payload:
+        await handle_measure(payload)
+    
+    return payload
 
 @fast_mqtt.on_disconnect()
 def disconnect(client, packet, exc=None):
@@ -71,19 +68,20 @@ def subscribe(client, mid, qos, properties):
     logger.info(f"MID {mid}")
     logger.info(f"Properties {properties}")
 
-# Startup event routine
-@app.on_event("startup")
-async def startup():
-    logger.info("Application startup")
-    await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
-    asyncio.create_task(kafka_init())
-    asyncio.create_task(consume())
 
-# Shutdown event routine
+@app.on_event("startup")
+async def startup_event():
+    database_ = app.state.database
+    if not database_.is_connected:
+        await database.connect()
+    asyncio.create_task(consume())
+        
 @app.on_event("shutdown")
-async def shutdown():
-    logger.info("Application shutdown")
-    await db.close_database_connection()
+async def shutdown_event():
+    database_ = app.state.database
+    if database_.is_connected:
+        await database.disconnect()
+    
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", reload=True, host="0.0.0.0", port=8001)
