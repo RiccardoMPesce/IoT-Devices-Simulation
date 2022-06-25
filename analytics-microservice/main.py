@@ -5,7 +5,7 @@ import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from db.database import test_clickhouse
+from db.database import test_ch, ch_init
 from utils.logger import logger_config
 
 
@@ -30,7 +30,8 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     logger.info("Testing clickhouse")
-    await test_clickhouse()
+    await test_ch()
+    await ch_init()
         
 @app.on_event("shutdown")
 async def shutdown_event():
