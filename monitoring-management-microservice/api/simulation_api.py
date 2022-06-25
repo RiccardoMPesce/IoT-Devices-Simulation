@@ -24,7 +24,7 @@ router = APIRouter(prefix="/simulate")
     },
 )
 async def simulate_recording(device_id: str, 
-                             measure_value: Union[int, bool, float, str], 
+                             measure_value: Union[int, bool, float], 
                              health: bool = Query(True), 
                              db: DatabaseManager = Depends(get_database)) -> list:
     
@@ -34,7 +34,7 @@ async def simulate_recording(device_id: str,
         measure = {
             "device_id": device_id,
             "measure": device.get("measure"),
-            "measure_value": measure_value,
+            "measure_value": float(measure_value),
             "health": health,
             "timestamp": datetime.utcnow().timestamp()
         }
