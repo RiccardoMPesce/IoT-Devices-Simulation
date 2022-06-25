@@ -26,7 +26,7 @@ class Record(ormar.Model):
     measure: str = ormar.String(max_length=256, nullable=False)
     is_device_healthy: bool = ormar.Boolean(default=True, nullable=False)
     timestamp: datetime = ormar.DateTime(default=datetime.utcnow, nullable=False)
-    value: Union[int, str, bool, float] = ormar.String(max_length=128, default="test")
+    value: float = ormar.Float(nullable=False)
 
 engine = sqlalchemy.create_engine(settings.DB_URI)
 metadata.drop_all(engine)
