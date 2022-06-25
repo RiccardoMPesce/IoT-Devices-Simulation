@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from db.database import test_ch, ch_init
 from utils.logger import logger_config
+from api.endpoint import endpoint
 
 
 logger = logger_config(__name__)
@@ -22,10 +23,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# app.include_router(endpoint)
-
-# Init MQTT
-
+app.include_router(endpoint)
 
 @app.on_event("startup")
 async def startup_event():
@@ -39,4 +37,4 @@ async def shutdown_event():
     
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True, host="0.0.0.0", port=8001)
+    uvicorn.run("main:app", reload=True, host="0.0.0.0", port=8002)
