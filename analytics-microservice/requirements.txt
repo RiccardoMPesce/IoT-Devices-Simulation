@@ -3,4 +3,5 @@ pydantic
 uvicorn
 starlette_exporter
 starlette
-clickhouse-driver
+aiohttp
+aiochclient
