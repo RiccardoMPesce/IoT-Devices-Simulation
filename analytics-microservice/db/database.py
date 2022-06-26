@@ -153,7 +153,7 @@ async def ch_init():
             logger.info(f"Created table {table_name} with query:\n{table_query}")
 
 
-async def stats_by_device(device_id: str):
+async def stats_by_device(device_id: str) -> dict:
     async with ClientSession() as s:
         client = ChClient(
             s, 
@@ -161,12 +161,45 @@ async def stats_by_device(device_id: str):
             compress_response=True
         )
 
+        dwh_query = f"""
+                    SELECT * 
+                    FROM dwh.fact_recording 
+                    WHERE device_id = '{device_id}'
+                """
+        
+        marts_query = f"""
+                    SELECT * 
+                    FROM marts.fact_recording 
+                    WHERE device_id = '{device_id}'
+                """
+
         device_stats = {}
+        
+        measure_obs = []
+        measure_health = []
 
-        async for row in client.iterate("SELECT * FROM dwh.fact_recording"):
-            pass 
+        logger.info(f"Using query:\n{dwh_query}")
+        async for row in client.iterate(dwh_query):
+            measure_obs += [row["measure_value"]] 
+            measure_health += [row["health"]]
 
-        return [{}]
+        device_stats["average"] = round(sum(measure_obs) / len(measure_obs), 2)
+        device_stats["standard_deviation"] = round((sum([
+            (obs - device_stats["average"]) ** 2 for obs in measure_obs
+        ])) ** 0.5, 2)
+        device_stats["average_health_uptime_fraction"] = sum(measure_health) / len(measure_health)
+
+        logger.info(f"Using query:\n{marts_query}")
+        
+        row = await client.fetchone(marts_query)
+
+        device_stats["last_update"] = row["timestamp"]
+        device_stats["last_value"] = row["measure_value"]
+        device_stats["is_healthy"] = row["health"]
+        device_stats["measure"] = row["measure"]
+        device_stats["device_id"] = row["device_id"]
+
+        return device_stats
 
     
 
