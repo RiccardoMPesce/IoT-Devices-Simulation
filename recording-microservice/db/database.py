@@ -24,7 +24,7 @@ class Record(ormar.Model):
     recording_id: int = ormar.Integer(primary_key=True, autoincrement=True)
     device_id: str = ormar.UUID(nullable=False)
     measure: str = ormar.String(max_length=256, nullable=False)
-    is_device_healthy: bool = ormar.Boolean(default=True, nullable=False)
+    is_device_healthy: int = ormar.Integer(default=1, nullable=False)
     timestamp: datetime = ormar.DateTime(default=datetime.utcnow, nullable=False)
     value: float = ormar.Float(nullable=False)
 

@@ -25,7 +25,7 @@ router = APIRouter(prefix="/simulate")
 )
 async def simulate_recording(device_id: str, 
                              measure_value: Union[int, bool, float], 
-                             health: bool = Query(True), 
+                             health: int, 
                              db: DatabaseManager = Depends(get_database)) -> list:
     
     device = await db.device_get_one(device_id=device_id)
