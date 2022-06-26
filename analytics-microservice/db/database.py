@@ -26,16 +26,19 @@ CH_QUERY_KAFKA_TABLE =  f"""
                                 record_id             Int32,
                                 device_id             UUID,
                                 measure               String,
-                                is_device_healthy     Bool,
-                                timestamp             DateTime,
-                                value                 Float64
+                                is_device_healthy     UInt8,
+                                timestamp             Float64,
+                                measure_value         Float64
                             )
                             ENGINE = Kafka 
                             SETTINGS
                                 kafka_broker_list = '{settings.KAFKA_INSTANCE}',
                                 kafka_topic_list = '{settings.KAFKA_RECORDING_TOPIC}',
                                 kafka_group_name = '{settings.KAFKA_CONSUMER_GROUP}',
-                                kafka_format = 'JSONEachRow'
+                                kafka_format = 'JSONEachRow',
+                                kafka_row_delimiter = '\n',
+                                kafka_num_consumers = 1,
+                                kafka_skip_broken_messages = 1
                                 ;
                         """
 
@@ -46,24 +49,94 @@ CH_QUERY_DWH_TABLE =    f"""
                                 record_id             Int32,
                                 device_id             UUID,
                                 measure               String,
-                                is_device_healthy     Bool,
+                                is_device_healthy     UInt8,
                                 timestamp             DateTime,
-                                value                 Float64
+                                update_epoch          UInt32,    
+                                measure_value         Float64
                             )
                             ENGINE = MergeTree 
-                            ORDER BY (measure, timestamp)
-                            PARTITION_BY timestamp
+                            ORDER BY (record_id, measure, toYYYYMMDD(timestamp))
                             ;
                         """
 
 
 CH_QUERY_MV_DWH_TABLE = f"""
-                            CREATE MATERIALIZED VIEW stage.mv_fact_recording
+                            CREATE MATERIALIZED VIEW IF NOT EXISTS dwh.mv_fact_recording
                             TO dwh.fact_recording
-                            AS SELECT *
+                            AS SELECT record_id,
+                                      device_id,
+                                      measure,
+                                      is_device_healthy,
+                                      toDateTime(timestamp),
+                                      toUnixTimestamp(now()) AS update_epoch,
+                                      measure_value  
                             FROM stage.kafka_fact_recording
+                            GROUP BY record_id, device_id, measure, is_device_healthy, timestamp, value
                             ;
                         """
+
+
+CH_QUERY_MARTS_TABLE =  f"""
+                            CREATE TABLE IF NOT EXISTS marts._fact_recording
+                            (
+                                record_id             Int32,
+                                device_id             UUID,
+                                measure               String,
+                                is_device_healthy     AggregateFunction(argMax, UInt8, UInt32),
+                                timestamp             AggregateFunction(max, DateTime),
+                                update_epoch          AggregateFunction(max, UInt32),
+                                measure_value         AggregateFunction(argMax, Float64, UInt32)
+                            )
+                            ENGINE = SummingMergeTree 
+                            ORDER BY (record_id, device_id, measure)
+                            ;
+                        """
+
+
+CH_QUERY_MV_MARTS_TABLE = f"""
+                            CREATE MATERIALIZED VIEW IF NOT EXISTS marts.mv_fact_recording
+                            TO marts._fact_recording
+                            AS SELECT record_id,
+                                      device_id,
+                                      measure,
+                                      argMaxState(is_device_healthy, fr.update_epoch) AS is_device_healthy,
+                                      maxState(timestamp)                             AS timestamp,
+                                      maxState(update_epoch)                          AS update_epoch,
+                                      argMaxState(measure_value, fr.update_epoch)     AS value
+                            FROM dwh.fact_recording AS fr
+                            GROUP BY record_id,
+                                     device_id,
+                                     measure  
+                            ;
+                        """
+
+
+CH_QUERY_MARTS_VIEW =   f"""
+                            CREATE VIEW IF NOT EXISTS marts.fact_recording
+                            TO marts._fact_recording
+                            AS SELECT record_id,
+                                      device_id,
+                                      measure,
+                                      argMaxMerge(is_device_healthy) AS is_device_healthy,
+                                      maxMerge(timestamp)            AS timestamp,
+                                      maxMerge(update_epoch)         AS update_epoch,
+                                      argMaxMerge(measure_value)     AS value
+                            FROM marts._fact_recording
+                            GROUP BY record_id,
+                                     device_id,
+                                     measure  
+                            ;
+                        """
+
+
+tables_to_create = {
+    "stage.kafka_fact_recording": CH_QUERY_KAFKA_TABLE,
+    "dwh.fact_recording": CH_QUERY_DWH_TABLE,
+    "dwh.mv_fact_recording": CH_QUERY_MV_DWH_TABLE,
+    "marts._fact_recording": CH_QUERY_MARTS_TABLE,
+    "marts.mv_fact_recording": CH_QUERY_MV_MARTS_TABLE,
+    "marts.fact_recording": CH_QUERY_MARTS_VIEW
+}
 
 
 async def ch_init():
@@ -80,5 +153,7 @@ async def ch_init():
         await init_client.execute("CREATE DATABASE IF NOT EXISTS marts;")
         logger.info("Database \"marts\" created/already present")
 
-        result = await init_client.execute(CH_QUERY_KAFKA_TABLE)
-        logger.info(f"Created stage.kafka_fact_recording table with query: {CH_QUERY_KAFKA_TABLE}")
+        for table_name, table_query in tables_to_create.items():
+            await init_client.execute(f"DROP TABLE IF EXISTS {table_name};")
+            await init_client.execute(table_query)
+            logger.info(f"Created table {table_name} with query:\n{table_query}")
