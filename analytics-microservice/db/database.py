@@ -24,7 +24,7 @@ CH_QUERY_KAFKA_TABLE =  f"""
                             CREATE TABLE IF NOT EXISTS stage.kafka_fact_recording
                             (
                                 record_id             Int32,
-                                device_id             UUID,
+                                device_id             String,
                                 measure               String,
                                 is_device_healthy     UInt8,
                                 timestamp             Float64,
@@ -47,7 +47,7 @@ CH_QUERY_DWH_TABLE =    f"""
                             CREATE TABLE IF NOT EXISTS dwh.fact_recording
                             (
                                 record_id             Int32,
-                                device_id             UUID,
+                                device_id             String,
                                 measure               String,
                                 is_device_healthy     UInt8,
                                 timestamp             DateTime,
@@ -80,7 +80,7 @@ CH_QUERY_MARTS_TABLE =  f"""
                             CREATE TABLE IF NOT EXISTS marts._fact_recording
                             (
                                 record_id             Int32,
-                                device_id             UUID,
+                                device_id             String,
                                 measure               String,
                                 is_device_healthy     AggregateFunction(argMax, UInt8, UInt32),
                                 timestamp             AggregateFunction(max, DateTime),
