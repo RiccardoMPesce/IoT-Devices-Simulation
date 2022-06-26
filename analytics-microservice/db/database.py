@@ -195,19 +195,101 @@ async def stats_by_device(device_id: str) -> dict:
 
         device_stats["last_update"] = row["timestamp"]
         device_stats["last_value"] = row["measure_value"]
+        device_stats["max_value"] = max(measure_obs)
+        device_stats["min_value"] = min(measure_obs)
         device_stats["is_healthy"] = row["health"]
         device_stats["measure"] = row["measure"]
         device_stats["device_id"] = row["device_id"]
+        device_stats["number_of_observations"] = len(measure_obs)
 
         return device_stats
 
     
 
-async def stats_by_measure():
-    pass 
+async def stats_by_measure(measure: str):
+    async with ClientSession() as s:
+        client = ChClient(
+            s, 
+            url=settings.DB_URI,
+            compress_response=True
+        )
 
-async def stats_by_device_in_range():
-    pass 
+        dwh_query = f"""
+                    SELECT * 
+                    FROM dwh.fact_recording 
+                    WHERE measure = '{measure}'
+                """
+        
+        marts_query = f"""
+                    SELECT * 
+                    FROM marts.fact_recording 
+                    WHERE measure = '{measure}'
+                """
 
-async def stats_by_measure_in_range():
-    pass 
+        measure_stats = {}
+        
+        measure_obs = []
+        measure_health = []
+        
+        measure_devices = set()
+
+        logger.info(f"Using query:\n{dwh_query}")
+        async for row in client.iterate(dwh_query):
+            measure_obs += [row["measure_value"]] 
+            measure_health += [row["health"]]
+            measure_devices.add(row["device_id"])
+
+        measure_stats["average"] = round(sum(measure_obs) / len(measure_obs), 2)
+        measure_stats["standard_deviation"] = round((sum([
+            (obs - measure_stats["average"]) ** 2 for obs in measure_obs
+        ])) ** 0.5, 2)
+        measure_stats["max_value"] = max(measure_obs)
+        measure_stats["min_value"] = min(measure_obs)
+
+        logger.info(f"Using query:\n{marts_query}")
+        
+        row = await client.fetchone(marts_query)
+
+        measure_stats["last_update"] = row["timestamp"]
+        measure_stats["last_value"] = row["measure_value"]
+        measure_stats["last_device"] = row["device_id"]
+        measure_stats["measure"] = row["measure"]
+        measure_stats["devices"] = list(measure_devices)
+
+        return measure_stats
+
+async def last_device_state(device_id: str) -> dict:
+    async with ClientSession() as s:
+        client = ChClient(
+            s, 
+            url=settings.DB_URI,
+            compress_response=True
+        )
+        
+        marts_query = f"""
+                    SELECT * 
+                    FROM marts.fact_recording 
+                    WHERE device_id = '{device_id}'
+                """
+
+        row = await client.fetchone(marts_query)
+
+        return dict(row)
+
+async def last_measure_state(measure: str) -> dict:
+    async with ClientSession() as s:
+        client = ChClient(
+            s, 
+            url=settings.DB_URI,
+            compress_response=True
+        )
+        
+        marts_query = f"""
+                    SELECT * 
+                    FROM marts.fact_recording 
+                    WHERE measure = '{measure}'
+                """
+
+        row = await client.fetchone(marts_query)
+
+        return dict(row)
