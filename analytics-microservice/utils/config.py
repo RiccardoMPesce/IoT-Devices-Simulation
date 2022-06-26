@@ -28,9 +28,9 @@ class Settings(BaseSettings):
     App config settings
     """
 
-    PROJECT_NAME: str = os.getenv("PROJECT_NAME2", "Analytics-Microservice")
+    PROJECT_NAME: str = os.getenv("PROJECT_NAME3", "Analytics-Microservice")
     VERSION: str = "1.0"
-    DESCRIPTION: str = "Simple app to record IoT sensors measures"
+    DESCRIPTION: str = "App to get analytical reports on IoT devices activity"
     SECRET_KET: str = secrets.token_urlsafe(32)
     DEBUG: bool = bool(os.getenv("DEBUG", "False"))
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "dev")

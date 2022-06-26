@@ -54,9 +54,9 @@ async def kafka_init():
     await producer.start()
     try:
         for topic in kafka_topics:
-            logger.info(f"Creating topic {topic} with test data")
+            # logger.info(f"Creating topic {topic} with test data")
             value_json = json.dumps({topic: "monitoring-management-microservice up"}).encode("utf-8")
-            await producer.send_and_wait(topic=topic, value=value_json)
+            # await producer.send_and_wait(topic=topic, value=value_json)
     finally:
         await producer.stop()
 

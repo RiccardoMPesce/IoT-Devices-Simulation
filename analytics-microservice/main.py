@@ -7,13 +7,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from db.database import test_ch, ch_init
 from utils.logger import logger_config
+from utils.config import get_config
 from api.endpoint import endpoint
 
 
 logger = logger_config(__name__)
-# settings = get_config()
 
-app = FastAPI()
+settings = get_config()
+
+app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION, description=settings.DESCRIPTION)
 
 app.add_middleware(
     CORSMiddleware,

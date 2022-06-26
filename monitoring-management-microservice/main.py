@@ -76,7 +76,7 @@ def subscribe(client, mid, qos, properties):
 async def startup():
     logger.info("Application startup")
     await db.connect_to_database(path=settings.DB_URI, db_name=settings.DB_NAME)
-    asyncio.create_task(kafka_init())
+    # asyncio.create_task(kafka_init())
     asyncio.create_task(consume())
 
 # Shutdown event routine
