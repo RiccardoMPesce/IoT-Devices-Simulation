@@ -3,11 +3,7 @@ import asyncio
 import json 
 
 from fastapi import FastAPI
-
 from fastapi.middleware.cors import CORSMiddleware
-
-# Used to add Prometheus support
-from starlette_exporter import PrometheusMiddleware, handle_metrics
 
 from utils.config import get_config
 from db.common import db
@@ -37,8 +33,6 @@ app.include_router(endpoint)
 fast_mqtt.init_app(app)
 
 # Add Prometheus
-app.add_middleware(PrometheusMiddleware)
-app.add_route("/metrics", handle_metrics)
 
 logger.info("API launched for " + settings.ENVIRONMENT + " environment")
 
