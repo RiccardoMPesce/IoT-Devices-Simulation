@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     App config settings
     """
 
-    PROJECT_NAME: str = "Monitoring-Management-Microservice"
+    PROJECT_NAME: str = os.getenv("PROJECT_NAME1", "Monitoring-Management-Microservice")
     VERSION: str = "1.0"
     DESCRIPTION: str = "Simple app to monitor and manage IoT remote devices"
     SECRET_KET: str = secrets.token_urlsafe(32)

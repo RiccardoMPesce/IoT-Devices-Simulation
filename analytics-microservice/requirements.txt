@@ -1,9 +1,7 @@
 fastapi
 pydantic
 uvicorn
-pymongo
-motor
 starlette_exporter
 starlette
-fastapi-mqtt
-aiokafka
+aiohttp
+aiochclient

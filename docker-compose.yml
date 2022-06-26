@@ -76,15 +76,6 @@ services:
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - POSTGRES_DB=recordings
     env_file: .env
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgadmin
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: $POSTGRES_EMAIL
-  #     PGADMIN_DEFAULT_PASSWORD: $POSTGRES_PASSWORD
-  #   ports:
-  #     - 5050:80
-  #   restart: always
   mongo-express:
     container_name: mongo-express
     image: mongo-express
@@ -144,7 +135,6 @@ services:
       - KAFKA_HOST=${KAFKA_HOST}
       - KAFKA_PORT=${KAFKA_PORT}
       - KAFKA_TOPICS=${KAFKA_TOPICS}
-      - DATABASE_URL=$POSTGRES_URL
     volumes:
       - ./recording-microservice/:/app/recording-microservice/
     env_file: .env
@@ -153,6 +143,27 @@ services:
       - mosquitto
     ports:
       - 8001:8001
+  analytics-microservice:
+    build: 
+      context: ./analytics-microservice
+      dockerfile: Dockerfile
+    # command: python main.py
+    # command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+    command: sh -c "./wait-for.sh kafka:9092 --timeout 60 -- python main.py"
+    container_name: analytics-microservice
+    restart: always
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - KAFKA_HOST=${KAFKA_HOST}
+      - KAFKA_PORT=${KAFKA_PORT}
+      - KAFKA_TOPICS=${KAFKA_TOPICS}
+    volumes:
+      - ./analytics-microservice/:/app/analytics-microservice/
+    env_file: .env
+    depends_on:
+      - kafka
+    ports:
+      - 8002:8002
   mosquitto:
     image: eclipse-mosquitto
     container_name: mosquitto
@@ -165,3 +176,11 @@ services:
     ports:
       - 1883:1883
       - 9001:9001
+  clickhouse:
+    image: yandex/clickhouse-server
+    hostname: clickhouse
+    container_name: clickhouse
+    ports:
+      - 8123:8123
+    volumes:
+      - ./data/clickhouse:/var/lib/clickhouse
