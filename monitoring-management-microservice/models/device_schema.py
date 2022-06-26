@@ -1,4 +1,5 @@
-from datetime import datetime
+import time
+
 from uuid import uuid4
 
 from typing import Any, Optional, Union
@@ -10,7 +11,7 @@ class Device(BaseModel):
     measure: str = Field(...)
     publish_qos: int = Field(..., ge=0, le=2)
     status: bool = Field(True)
-    update_datetime: float = Field(datetime.utcnow().timestamp(), ge=0.0)
+    update_datetime: int = Field(int(time.time()), ge=0.0)
 
     class Config:
         schema_extra = {
@@ -19,7 +20,7 @@ class Device(BaseModel):
                 "measure": "temperature-room24",
                 "publish_qos": 1,
                 "status": "on",
-                "update_datetime": 1653384081.510052
+                "update_datetime": 1653384081
             }
         }
 
@@ -28,7 +29,7 @@ class UpdateDevice(BaseModel):
     measure: Optional[str]
     publish_qos: Optional[int]
     status: Optional[bool]
-    update_datetime: float = Field(datetime.utcnow().timestamp(), ge=0.0)
+    update_datetime: int = Field(time.time(), ge=0.0)
 
     class Config:
         schema_extra = {
@@ -37,6 +38,6 @@ class UpdateDevice(BaseModel):
                 "measure": "luminosity-room2",
                 "publish_qos": 1,
                 "status": "off",
-                "update_datetime": 1653384081.540054
+                "update_datetime": 1653384081
             }
         }

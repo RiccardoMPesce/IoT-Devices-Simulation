@@ -26,8 +26,8 @@ CH_QUERY_KAFKA_TABLE =  f"""
                                 record_id             Int32,
                                 device_id             String,
                                 measure               String,
-                                is_device_healthy     UInt8,
-                                timestamp             Float64,
+                                health                UInt8,
+                                timestamp             UInt32,
                                 measure_value         Float64
                             )
                             ENGINE = Kafka 
@@ -49,7 +49,7 @@ CH_QUERY_DWH_TABLE =    f"""
                                 record_id             Int32,
                                 device_id             String,
                                 measure               String,
-                                is_device_healthy     UInt8,
+                                health                UInt8,
                                 timestamp             DateTime,
                                 update_epoch          UInt32,    
                                 measure_value         Float64
@@ -66,12 +66,12 @@ CH_QUERY_MV_DWH_TABLE = f"""
                             AS SELECT record_id,
                                       device_id,
                                       measure,
-                                      is_device_healthy,
-                                      toDateTime(timestamp),
+                                      health,
+                                      toDateTime(timestamp)  AS timestamp,
                                       toUnixTimestamp(now()) AS update_epoch,
                                       measure_value  
                             FROM stage.kafka_fact_recording
-                            GROUP BY record_id, device_id, measure, is_device_healthy, timestamp, value
+                            GROUP BY record_id, device_id, measure, health, timestamp, measure_value
                             ;
                         """
 
@@ -82,9 +82,9 @@ CH_QUERY_MARTS_TABLE =  f"""
                                 record_id             Int32,
                                 device_id             String,
                                 measure               String,
-                                is_device_healthy     AggregateFunction(argMax, UInt8, UInt32),
-                                timestamp             AggregateFunction(max, DateTime),
-                                update_epoch          AggregateFunction(max, UInt32),
+                                health                AggregateFunction(argMax, UInt8, UInt32),
+                                timestamp             AggregateFunction(argMax, DateTime, UInt32),
+                                update_epoch          AggregateFunction(argMax, UInt32, UInt32),
                                 measure_value         AggregateFunction(argMax, Float64, UInt32)
                             )
                             ENGINE = SummingMergeTree 
@@ -99,10 +99,10 @@ CH_QUERY_MV_MARTS_TABLE = f"""
                             AS SELECT record_id,
                                       device_id,
                                       measure,
-                                      argMaxState(is_device_healthy, fr.update_epoch) AS is_device_healthy,
-                                      maxState(timestamp)                             AS timestamp,
-                                      maxState(update_epoch)                          AS update_epoch,
-                                      argMaxState(measure_value, fr.update_epoch)     AS value
+                                      argMaxState(health, fr.update_epoch)            AS health,
+                                      argMaxState(timestamp, fr.update_epoch)         AS timestamp,
+                                      argMaxState(update_epoch, fr.update_epoch)      AS update_epoch,
+                                      argMaxState(measure_value, fr.update_epoch)     AS measure_value
                             FROM dwh.fact_recording AS fr
                             GROUP BY record_id,
                                      device_id,
@@ -117,10 +117,10 @@ CH_QUERY_MARTS_VIEW =   f"""
                             AS SELECT record_id,
                                       device_id,
                                       measure,
-                                      argMaxMerge(is_device_healthy) AS is_device_healthy,
-                                      maxMerge(timestamp)            AS timestamp,
-                                      maxMerge(update_epoch)         AS update_epoch,
-                                      argMaxMerge(measure_value)     AS value
+                                      argMaxMerge(health)            AS health,
+                                      argMaxMerge(timestamp)         AS timestamp,
+                                      argMaxMerge(update_epoch)      AS update_epoch,
+                                      argMaxMerge(measure_value)     AS measure_value
                             FROM marts._fact_recording
                             GROUP BY record_id,
                                      device_id,
@@ -155,5 +155,7 @@ async def ch_init():
 
         for table_name, table_query in tables_to_create.items():
             await init_client.execute(f"DROP TABLE IF EXISTS {table_name};")
+        
+        for table_name, table_query in tables_to_create.items():
             await init_client.execute(table_query)
             logger.info(f"Created table {table_name} with query:\n{table_query}")
