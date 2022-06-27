@@ -1,9 +1,10 @@
 import json
 import time
 
-from fastapi import APIRouter, HTTPException, status, Depends, Query
+from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
 from typing import Union
+from prometheus_client import Counter, CollectorRegistry, push_to_gateway
 
 from db.common import get_database, DatabaseManager
 from utils.mqtt import fast_mqtt
@@ -15,6 +16,9 @@ logger = logger_config(__name__)
 settings = get_config()
 
 router = APIRouter(prefix="/simulate")
+
+registry = CollectorRegistry()
+counter = Counter("number_of_accesses", "Number of sensor accesses", ["device_id"], registry=registry)
 
 @router.put(
     "",
@@ -44,6 +48,8 @@ async def simulate_recording(device_id: str,
             payload=json.dumps(measure), 
             qos=device.get("publish_qos")
         )
+        counter.labels(device_id=device_id).inc()
+        push_to_gateway("pushgateway:9091", job="pushgateway", registry=registry)
         return JSONResponse(status_code=status.HTTP_201_CREATED, content="Measure " + str(measure) + " pushed to topic " + topic)
     else:
         raise HTTPException(
