@@ -46,6 +46,12 @@ class Settings(BaseSettings):
     MQTT_BROKER_HOST = os.getenv("MQTT_BROKER_HOST", "broker.hivemq.com")
     MQTT_BROKER_PORT = os.getenv("MQTT_BROKER_PORT", 1883)
     MQTT_TOPIC_PREFIX = os.getenv("MQTT_TOPIC_PREFIX", "rmp/dsbd202122/")
+    PROMETHEUS_HOST = os.getenv("PROMETHEUS_HOST", "prometheus")
+    PROMETHEUS_PORT = os.getenv("PROMETHEUS_PORT", "9090")
+    PUSHGATEWAY_HOST = os.getenv("PUSHGATEWAY_HOST", "pushgateway")
+    PUSHGATEWAY_PORT = os.getenv("PUSHGATEWAY_PORT", "9091")
+    PROMETHEUS_INSTANCE = f"{PROMETHEUS_HOST}:{PROMETHEUS_PORT}"
+    PUSHGATEWAY_INSTANCE = f"{PUSHGATEWAY_HOST}:{PUSHGATEWAY_PORT}"
 
     class Config:
         case_sensitive = True

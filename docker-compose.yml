@@ -185,15 +185,22 @@ services:
     volumes:
       - ./data/clickhouse:/var/lib/clickhouse
   prometheus:
-    image: prom/prometheus
+    image: bitnami/prometheus
     restart: always
     container_name: prometheus
     ports:
       - 9090:9090
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
+      - ./data/prometheus:/etc/prometheus
+  pushgateway:
+    image: bitnami/pushgateway
+    restart: always
+    container_name: pushgateway
+    expose:
+      - 9091
+    ports:
+      - 9091:9091
   grafana:
     image: grafana/grafana
     restart: always
@@ -204,5 +211,8 @@ services:
       - 3000:3000
     volumes:
       - ./datasource.yml:/etc/grafana/provisioning/datasource.yml
+      - ./data/grafana:/var/lib/grafana
+      - ./data/grafana_data/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./data/grafana_data/provisioning/datasources:/etc/grafana/provisioning/datasources
     env_file:
       - ./config.monitoring
