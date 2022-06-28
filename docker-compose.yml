@@ -214,5 +214,7 @@ services:
       - ./data/grafana:/var/lib/grafana
       - ./data/grafana_data/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./data/grafana_data/provisioning/datasources:/etc/grafana/provisioning/datasources
-    env_file:
-      - ./config.monitoring
+    environment:
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin

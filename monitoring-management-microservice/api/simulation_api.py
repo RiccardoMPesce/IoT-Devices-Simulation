@@ -20,8 +20,8 @@ router = APIRouter(prefix="/simulate")
 
 registry = CollectorRegistry()
 
-counter = Counter("number_of_accesses", "Number of sensor accesses", ["device_id"], registry=registry)
-summary = Summary("summary", "Latency took by devices", ["device_id"], registry=registry)
+counter = Counter("records", "Sensor records", ["device_id"], registry=registry)
+summary = Summary("summary", "Sensor latency", ["device_id"], registry=registry)
 
 @router.put(
     "",
