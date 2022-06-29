@@ -106,4 +106,4 @@ spec:
           hostPath:
             path: /data/kafka
             type: DirectoryOrCreate
-            
+          # mountPath: /data/kafka
