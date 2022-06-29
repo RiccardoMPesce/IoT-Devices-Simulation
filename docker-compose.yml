@@ -18,8 +18,8 @@ services:
     hostname: kafka
     ports:
       - 9093:9093
-    expose:
-      - 9093
+    # expose:
+    #   - 9093
     environment:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CREATE_TOPICS="test:1:1,measure_recordings:1:1,device_commands:1:1,sensor_metrics:1:1"
@@ -197,8 +197,8 @@ services:
     image: bitnami/pushgateway
     restart: always
     container_name: pushgateway
-    expose:
-      - 9091
+    # expose:
+    #   - 9091
     ports:
       - 9091:9091
   grafana:
