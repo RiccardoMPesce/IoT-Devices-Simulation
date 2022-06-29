@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-management-microservice
+  labels:
+    svc: monitoring-management-microservice
+spec:
+  ports:
+    - port: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: monitoring-management-microservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recording-microservice
+  labels:
+    svc: recording-microservice
+spec:
+  ports:
+    - port: 8001
+      protocol: TCP
+      name: http
+  selector:
+    app: recording-microservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-microservice
+  labels:
+    svc: analytics-microservice
+spec:
+  ports:
+    - port: 8002
+      protocol: TCP
+      name: http
+  selector:
+    app: analytics-microservice
