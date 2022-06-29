@@ -191,7 +191,7 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/etc/prometheus
   pushgateway:
     image: bitnami/pushgateway
@@ -210,7 +210,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./datasource.yml:/etc/grafana/provisioning/datasource.yml
+      - ./prometheus/datasource.yml:/etc/grafana/provisioning/datasource.yml
       - ./data/grafana:/var/lib/grafana
       - ./data/grafana_data/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./data/grafana_data/provisioning/datasources:/etc/grafana/provisioning/datasources
