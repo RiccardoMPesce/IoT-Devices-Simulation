@@ -39,7 +39,4 @@ data:
   RECORDING_MICROSERVICE_KAFKA_TOPICS: measure_recordings,device_commands
 kind: ConfigMap
 metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: analytics-microservice-env
   name: env

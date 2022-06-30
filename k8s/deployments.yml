@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: monitoring-management-microservice
-          image: monitoring-management-microservice
+          image: monitoring-management-microservice:latest
           envFrom:
             - configMapRef:
                 name: env
@@ -53,6 +53,7 @@ spec:
   selector:
     matchLabels:
       app: recording-microservice
+  resources:
   template:
     metadata:
       labels:
@@ -60,7 +61,7 @@ spec:
     spec:
       containers:
         - name: recording-microservice
-          image: recording-microservice
+          image: recording-microservice:latest
           envFrom:
             - configMapRef:
                 name: env
@@ -102,7 +103,7 @@ spec:
     spec:
       containers:
         - name: analytics-microservice
-          image: analytics-microservice
+          image: analytics-microservice:latest
           envFrom:
             - configMapRef:
                 name: env
@@ -111,7 +112,7 @@ spec:
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
-              port: 80012
+              port: 8002
               path: /
             initialDelaySeconds: 120
             periodSeconds: 5

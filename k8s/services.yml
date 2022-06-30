@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: monitoring-management-microservice
+  name: monitoring-management
   labels:
-    svc: monitoring-management-microservice
+    svc: monitoring-management
 spec:
   ports:
     - port: 8000
@@ -15,9 +15,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: recording-microservice
+  name: recording
   labels:
-    svc: recording-microservice
+    svc: recording
 spec:
   ports:
     - port: 8001
@@ -29,9 +29,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: analytics-microservice
+  name: analytics
   labels:
-    svc: analytics-microservice
+    svc: analytics
 spec:
   ports:
     - port: 8002
