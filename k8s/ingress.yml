@@ -1,0 +1,38 @@
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: iotsimulationapp-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type"
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
+spec:
+  rules:
+    - host: iotsimulationapp.dev.loc
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: monitoring-management-microservice
+                port:
+                  number: 8000
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: recording-microservice
+                port:
+                  number: 8001
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: analytics-microservice
+                port:
+                  number: 8002

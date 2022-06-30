@@ -10,7 +10,7 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: monitoring-management-microservice
+    app: monitoring-management
 ---
 apiVersion: v1
 kind: Service

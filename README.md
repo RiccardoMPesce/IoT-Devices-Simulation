@@ -20,9 +20,15 @@ Così facendo avviamo il cluster Kubernetes locale, mappiamo il docker runtime a
 In seguito costruiamo le immagini di docker utilizzando il tag latest.
 
 ```
-docker build -t monitoring-management:latest ./monitoring-management-microservice
+docker build -t monitoring-management-microservice:latest ./monitoring-management-microservice
 
-docker build -t recording:latest ./recording-microservice
+docker build -t recording-microservice:latest ./recording-microservice
 
-docker build -t analytics:latest ./analytics-microservice
+docker build -t analytics-microservice:latest ./analytics-microservice
+```
+
+E poi creare i pods con il comando
+
+```
+kubectl apply -f ./k8s
 ```

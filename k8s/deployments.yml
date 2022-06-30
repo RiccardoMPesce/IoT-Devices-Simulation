@@ -4,10 +4,10 @@ metadata:
   name: monitoring-management-microservice
 spec:
   replicas: 3
-  revisionHistoryLimit: 3
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
+  # revisionHistoryLimit: 3
+  # strategy:
+  #   rollingUpdate:
+  #     maxSurge: 1
   selector:
     matchLabels:
       app: monitoring-management-microservice
@@ -24,21 +24,21 @@ spec:
                 name: env
           ports:
             - containerPort: 8000
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            httpGet:
-              port: 8000
-              path: /
-            initialDelaySeconds: 120
-            periodSeconds: 5
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              port: 8000
-              path: /
-            initialDelaySeconds: 60
-            periodSeconds: 5
-            failureThreshold: 5
+          imagePullPolicy: Never
+          # livenessProbe:
+          #   httpGet:
+          #     port: 8000
+          #     path: /
+          #   initialDelaySeconds: 120
+          #   periodSeconds: 5
+          #   failureThreshold: 3
+          # readinessProbe:
+          #   httpGet:
+          #     port: 8000
+          #     path: /
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 5
+          #   failureThreshold: 5
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -46,10 +46,10 @@ metadata:
   name: recording-microservice
 spec:
   replicas: 3
-  revisionHistoryLimit: 3
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
+  # revisionHistoryLimit: 3
+  # strategy:
+  #   rollingUpdate:
+  #     maxSurge: 1
   selector:
     matchLabels:
       app: recording-microservice
@@ -67,21 +67,21 @@ spec:
                 name: env
           ports:
             - containerPort: 8001
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            httpGet:
-              port: 8001
-              path: /
-            initialDelaySeconds: 120
-            periodSeconds: 5
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              port: 8001
-              path: /
-            initialDelaySeconds: 60
-            periodSeconds: 5
-            failureThreshold: 5
+          imagePullPolicy: Never
+          # livenessProbe:
+          #   httpGet:
+          #     port: 8001
+          #     path: /
+          #   initialDelaySeconds: 120
+          #   periodSeconds: 5
+          #   failureThreshold: 3
+          # readinessProbe:
+          #   httpGet:
+          #     port: 8001
+          #     path: /
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 5
+          #   failureThreshold: 5
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -89,10 +89,10 @@ metadata:
   name: analytics-microservice
 spec:
   replicas: 3
-  revisionHistoryLimit: 3
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
+  # revisionHistoryLimit: 3
+  # strategy:
+  #   rollingUpdate:
+  #     maxSurge: 1
   selector:
     matchLabels:
       app: analytics-microservice
@@ -124,44 +124,3 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 5
             failureThreshold: 5
----
-# Ingress
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: iotsimulationapp-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
-    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type"
-    nginx.ingress.kubernetes.io/rewrite-target: "/"
-    # nginx.ingress.kubernetes.io/configuration-snippet: |
-    #  proxy_set_header X-Script-Name /seecity;
-spec:
-  rules:
-    - host: iotsimulationapp.dev.loc
-      http:
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: monitoring-management-microservice
-                port:
-                  number: 8000
-          - path: /
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: recording-microservice
-                port:
-                  number: 8001
-          - path: /
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: analytics-microservice
-                port:
-                  number: 8002
