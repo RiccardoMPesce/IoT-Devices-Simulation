@@ -4,10 +4,10 @@ metadata:
   name: monitoring-management-microservice
 spec:
   replicas: 3
-  # revisionHistoryLimit: 3
-  # strategy:
-  #   rollingUpdate:
-  #     maxSurge: 1
+  revisionHistoryLimit: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
   selector:
     matchLabels:
       app: monitoring-management-microservice
@@ -19,6 +19,8 @@ spec:
       containers:
         - name: monitoring-management-microservice
           image: monitoring-management-microservice:latest
+          command: ["python"]
+          args: ["main.py"]
           envFrom:
             - configMapRef:
                 name: env
@@ -29,14 +31,14 @@ spec:
           #   httpGet:
           #     port: 8000
           #     path: /
-          #   initialDelaySeconds: 120
+          #   initialDelaySeconds: 300
           #   periodSeconds: 5
           #   failureThreshold: 3
           # readinessProbe:
           #   httpGet:
           #     port: 8000
           #     path: /
-          #   initialDelaySeconds: 60
+          #   initialDelaySeconds: 300
           #   periodSeconds: 5
           #   failureThreshold: 5
 ---
@@ -46,10 +48,10 @@ metadata:
   name: recording-microservice
 spec:
   replicas: 3
-  # revisionHistoryLimit: 3
-  # strategy:
-  #   rollingUpdate:
-  #     maxSurge: 1
+  revisionHistoryLimit: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
   selector:
     matchLabels:
       app: recording-microservice
@@ -62,6 +64,8 @@ spec:
       containers:
         - name: recording-microservice
           image: recording-microservice:latest
+          command: ["python"]
+          args: ["main.py"]
           envFrom:
             - configMapRef:
                 name: env
@@ -89,10 +93,10 @@ metadata:
   name: analytics-microservice
 spec:
   replicas: 3
-  # revisionHistoryLimit: 3
-  # strategy:
-  #   rollingUpdate:
-  #     maxSurge: 1
+  revisionHistoryLimit: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
   selector:
     matchLabels:
       app: analytics-microservice
@@ -104,23 +108,25 @@ spec:
       containers:
         - name: analytics-microservice
           image: analytics-microservice:latest
+          command: ["python"]
+          args: ["main.py"]
           envFrom:
             - configMapRef:
                 name: env
           ports:
             - containerPort: 8002
           imagePullPolicy: IfNotPresent
-          livenessProbe:
-            httpGet:
-              port: 8002
-              path: /
-            initialDelaySeconds: 120
-            periodSeconds: 5
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              port: 8002
-              path: /
-            initialDelaySeconds: 60
-            periodSeconds: 5
-            failureThreshold: 5
+          # livenessProbe:
+          #   httpGet:
+          #     port: 8002
+          #     path: /
+          #   initialDelaySeconds: 120
+          #   periodSeconds: 5
+          #   failureThreshold: 3
+          # readinessProbe:
+          #   httpGet:
+          #     port: 8002
+          #     path: /
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 5
+          #   failureThreshold: 5
