@@ -2,9 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert --out temp_k8s/
+    kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
     kompose.version: 1.26.1 (HEAD)
-  creationTimestamp: null
   labels:
     io.kompose.service: postgres
   name: postgres
@@ -18,9 +17,8 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert --out temp_k8s/
+        kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
         kompose.version: 1.26.1 (HEAD)
-      creationTimestamp: null
       labels:
         io.kompose.service: postgres
     spec:
@@ -167,10 +165,9 @@ spec:
                   key: POSTGRES_PORT
                   name: env
             - name: POSTGRES_USER
-            - name: POSTGRES_USERNAME
               valueFrom:
                 configMapKeyRef:
-                  key: POSTGRES_USERNAME
+                  key: POSTGRES_USER
                   name: env
             - name: PROJECT_NAME1
               valueFrom:
@@ -216,7 +213,7 @@ spec:
           name: postgres
           ports:
             - containerPort: 5432
-          resources: {}
+          resources: 
           volumeMounts:
             - mountPath: /data/postgres/
               name: postgres-claim0

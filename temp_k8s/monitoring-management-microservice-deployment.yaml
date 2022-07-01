@@ -2,9 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert --out temp_k8s/
+    kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
     kompose.version: 1.26.1 (HEAD)
-  creationTimestamp: null
   labels:
     io.kompose.service: monitoring-management-microservice
   name: monitoring-management-microservice
@@ -18,17 +17,20 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert --out temp_k8s/
+        kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
         kompose.version: 1.26.1 (HEAD)
-      creationTimestamp: null
       labels:
         io.kompose.service: monitoring-management-microservice
     spec:
       containers:
-        - args:
-            - sh
-            - -c
-            - ./wait-for.sh kafka:9092 --timeout 60 -- python main.py
+        - command:
+          # - sh 
+          # - c
+          - python 
+          - main.py
+            # - sh
+            # - -c
+            # - ./wait-for.sh kafka:9092 --timeout 60 -- python main.py
           env:
             - name: CLICKHOUSE_HOST
               valueFrom:
@@ -220,14 +222,15 @@ spec:
                 configMapKeyRef:
                   key: RECORDING_MICROSERVICE_KAFKA_TOPICS
                   name: env
-          image: monitoring-management-microservice
+          image: monitoring-management-microservice:latest
+          imagePullPolicy: IfNotPresent
           name: monitoring-management-microservice
           ports:
             - containerPort: 8000
-          resources: {}
-          volumeMounts:
-            - mountPath: /app/monitoring-management-microservice/
-              name: monitoring-management-microservice-claim0
+          resources: 
+          # volumeMounts:
+          #   - mountPath: /app/monitoring-management-microservice/
+          #     name: monitoring-management-microservice-claim0
       restartPolicy: Always
       volumes:
         - name: monitoring-management-microservice-claim0

@@ -4,7 +4,6 @@ metadata:
   annotations:
     kompose.cmd: kompose convert --out temp_k8s/
     kompose.version: 1.26.1 (HEAD)
-  creationTimestamp: null
   labels:
     io.kompose.service: recording-microservice
   name: recording-microservice
@@ -20,7 +19,6 @@ spec:
       annotations:
         kompose.cmd: kompose convert --out temp_k8s/
         kompose.version: 1.26.1 (HEAD)
-      creationTimestamp: null
       labels:
         io.kompose.service: recording-microservice
     spec:
@@ -170,10 +168,10 @@ spec:
                 configMapKeyRef:
                   key: POSTGRES_PORT
                   name: env
-            - name: POSTGRES_USERNAME
+            - name: POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
-                  key: POSTGRES_USERNAME
+                  key: POSTGRES_USER
                   name: env
             - name: PROJECT_NAME1
               valueFrom:
@@ -219,7 +217,7 @@ spec:
           name: recording-microservice
           ports:
             - containerPort: 8001
-          resources: {}
+          resources: 
           volumeMounts:
             - mountPath: /app/recording-microservice/
               name: recording-microservice-claim0

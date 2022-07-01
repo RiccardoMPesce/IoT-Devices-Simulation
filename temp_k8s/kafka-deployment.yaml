@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert --out temp_k8s/
+    kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert --out temp_k8s/
+        kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
         kompose.version: 1.26.1 (HEAD)
       creationTimestamp: null
       labels:

@@ -2,9 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert --out temp_k8s/
+    kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
     kompose.version: 1.26.1 (HEAD)
-  creationTimestamp: null
   labels:
     io.kompose.service: analytics-microservice
   name: analytics-microservice
@@ -18,17 +17,20 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert --out temp_k8s/
+        kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
         kompose.version: 1.26.1 (HEAD)
-      creationTimestamp: null
       labels:
         io.kompose.service: analytics-microservice
     spec:
       containers:
-        - args:
-            - sh
-            - -c
-            - ./wait-for.sh kafka:9092 --timeout 60 -- python main.py
+        - command:
+            # - sh 
+            # - c
+            - python 
+            - main.py
+            # - sh
+            # - -c
+            # - ./wait-for.sh kafka:9092 --timeout 60 -- python main.py
           env:
             - name: CLICKHOUSE_HOST
               valueFrom:
@@ -215,14 +217,15 @@ spec:
                 configMapKeyRef:
                   key: RECORDING_MICROSERVICE_KAFKA_TOPICS
                   name: env
-          image: analytics-microservice
+          image: analytics-microservice:latest
+          imagePullPolicy: IfNotPresent
           name: analytics-microservice
           ports:
             - containerPort: 8002
-          resources: {}
-          volumeMounts:
-            - mountPath: /app/analytics-microservice/
-              name: analytics-microservice-claim0
+          resources: 
+          # volumeMounts:
+          #   - mountPath: /app/analytics-microservice/
+          #     name: analytics-microservice-claim0
       restartPolicy: Always
       volumes:
         - name: analytics-microservice-claim0

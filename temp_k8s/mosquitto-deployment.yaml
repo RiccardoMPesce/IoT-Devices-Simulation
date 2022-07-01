@@ -2,9 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert --out temp_k8s/
+    kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
     kompose.version: 1.26.1 (HEAD)
-  creationTimestamp: null
   labels:
     io.kompose.service: mosquitto
   name: mosquitto
@@ -18,36 +17,42 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert --out temp_k8s/
+        kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
         kompose.version: 1.26.1 (HEAD)
-      creationTimestamp: null
       labels:
         io.kompose.service: mosquitto
     spec:
       containers:
         - image: eclipse-mosquitto
           name: mosquitto
+          # command:
+          #   - ls
+          #   - -la
+          #   - /mosquitto/config
           ports:
             - containerPort: 1883
             - containerPort: 9001
-          resources: {}
+          resources: 
           volumeMounts:
             - mountPath: /mosquitto/config
-              name: mosquitto-claim0
+              name: mosquitto-config
+              subPath: config
             - mountPath: /mosquitto/data
-              name: mosquitto-claim1
+              name: mosquitto-data
+              subPath: data
             - mountPath: /mosquitto/log
-              name: mosquitto-claim2
+              name: mosquitto-log
+              subPath: log
       hostname: mosquitto
       restartPolicy: Always
       volumes:
-        - name: mosquitto-claim0
+        - name: mosquitto-data
           persistentVolumeClaim:
             claimName: mosquitto-claim0
-        - name: mosquitto-claim1
+        - name: mosquitto-config
           persistentVolumeClaim:
             claimName: mosquitto-claim1
-        - name: mosquitto-claim2
+        - name: mosquitto-log
           persistentVolumeClaim:
             claimName: mosquitto-claim2
 status: {}

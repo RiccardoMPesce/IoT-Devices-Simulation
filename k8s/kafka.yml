@@ -51,11 +51,6 @@ spec:
           env:
             - name: ALLOW_ANONYMOUS_LOGIN
               value: "yes"
-      volumes:
-        - name: zookeeper-data
-          hostPath:
-            path: /data/zookeeper
-            type: DirectoryOrCreate
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -100,8 +95,3 @@ spec:
               value: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
             - name: KAFKA_ZOOKEEPER_CONNECT
               value: zookeeper:2181
-      volumes:
-        - name: kafka-data
-          hostPath:
-            path: /data/kafka
-            type: DirectoryOrCreate
