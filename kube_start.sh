@@ -12,4 +12,4 @@ docker build -t recording-microservice:latest ./recording-microservice
 
 docker build -t analytics-microservice:latest ./analytics-microservice
 
-kubectl apply -f ./k8s
+kubectl apply -f ./temp_k8s

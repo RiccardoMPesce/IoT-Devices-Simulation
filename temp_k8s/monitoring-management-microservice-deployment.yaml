@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
+    kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
     kompose.version: 1.26.1 (HEAD)
   labels:
     io.kompose.service: monitoring-management-microservice
@@ -17,20 +17,15 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
+        kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
         kompose.version: 1.26.1 (HEAD)
       labels:
         io.kompose.service: monitoring-management-microservice
     spec:
       containers:
         - command:
-          # - sh 
-          # - c
-          - python 
-          - main.py
-            # - sh
-            # - -c
-            # - ./wait-for.sh kafka:9092 --timeout 60 -- python main.py
+            - python 
+            - main.py
           env:
             - name: CLICKHOUSE_HOST
               valueFrom:
@@ -222,7 +217,7 @@ spec:
                 configMapKeyRef:
                   key: RECORDING_MICROSERVICE_KAFKA_TOPICS
                   name: env
-          image: monitoring-management-microservice:latest
+          image: monitoring-management-microservice:latest 
           imagePullPolicy: IfNotPresent
           name: monitoring-management-microservice
           ports:

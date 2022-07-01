@@ -23,10 +23,9 @@ spec:
         io.kompose.service: recording-microservice
     spec:
       containers:
-        - args:
-            - sh
-            - -c
-            - ./wait-for.sh kafka:9092 --timeout 60 -- python main.py
+        - command:
+            - python 
+            - main.py
           env:
             - name: CLICKHOUSE_HOST
               valueFrom:
@@ -213,14 +212,15 @@ spec:
                 configMapKeyRef:
                   key: RECORDING_MICROSERVICE_KAFKA_TOPICS
                   name: env
-          image: recording-microservice
+          image: recording-microservice:latest
+          imagePullPolicy: IfNotPresent
           name: recording-microservice
           ports:
             - containerPort: 8001
           resources: 
-          volumeMounts:
-            - mountPath: /app/recording-microservice/
-              name: recording-microservice-claim0
+          # volumeMounts:
+          #   - mountPath: /app/recording-microservice/
+          #     name: recording-microservice-claim0
       restartPolicy: Always
       volumes:
         - name: recording-microservice-claim0

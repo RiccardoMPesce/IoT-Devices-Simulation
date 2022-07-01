@@ -29,6 +29,7 @@ data:
   POSTGRES_PASSWORD: ds&bd2021-2022
   POSTGRES_PORT: "5432"
   POSTGRES_USER: admin
+  POSTGRES_USERNAME: admin
   PROJECT_NAME1: monitoring-management-microservice
   PROJECT_NAME2: recording-microservice
   PROJECT_NAME3: analytics-microservice
