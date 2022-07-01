@@ -10,14 +10,14 @@ def database_uri():
     """
     DB connection details
     """
-    DB_HOST = os.getenv("MONGO_HOST", "mongodb")
-    DB_PORT = os.getenv("MONGO_PORT", "27017")
-    DB_NAME = os.getenv("MONGO_DB", "conf")
-    DB_USERNAME = os.getenv("MONGO_USER", "admin")
-    DB_PASSWORD = os.getenv("MONGO_PASSWORD")
+    MONGO_HOST = os.getenv("MONGO_HOST", "mongodb")
+    MONGO_PORT = os.getenv("MONGO_PORT", "27017")
+    MONGO_DB = os.getenv("MONGO_DB", "conf")
+    MONGO_USERNAME = os.getenv("MONGO_USER", "admin")
+    MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
 
     MONGODB_CLIENT_SETUP = (
-        f"mongodb://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?authSource={DB_USERNAME}"
+        f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}?authSource={MONGO_USERNAME}"
     )
 
     return MONGODB_CLIENT_SETUP

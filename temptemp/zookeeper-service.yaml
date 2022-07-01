@@ -4,15 +4,16 @@ metadata:
   annotations:
     kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
     kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
   labels:
-    io.kompose.service: monitoring-management-microservice
-  name: monitoring-management-microservice
+    io.kompose.service: zookeeper
+  name: zookeeper
 spec:
   ports:
-    - name: "8000"
-      port: 8000
-      targetPort: 8000
+    - name: "2181"
+      port: 2181
+      targetPort: 2181
   selector:
-    io.kompose.service: monitoring-management-microservice
+    io.kompose.service: zookeeper
 status:
   loadBalancer: {}

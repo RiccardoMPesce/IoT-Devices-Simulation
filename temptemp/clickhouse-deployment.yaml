@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: clickhouse
+  name: clickhouse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: clickhouse
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: clickhouse
+    spec:
+      containers:
+        - image: yandex/clickhouse-server
+          name: clickhouse
+          ports:
+            - containerPort: 8123
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/clickhouse
+              name: clickhouse-claim0
+      hostname: clickhouse
+      restartPolicy: Always
+      volumes:
+        - name: clickhouse-claim0
+          persistentVolumeClaim:
+            claimName: clickhouse-claim0
+status: {}

@@ -4,15 +4,16 @@ metadata:
   annotations:
     kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
     kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
   labels:
-    io.kompose.service: monitoring-management-microservice
-  name: monitoring-management-microservice
+    io.kompose.service: kafka
+  name: kafka
 spec:
   ports:
-    - name: "8000"
-      port: 8000
-      targetPort: 8000
+    - name: "9093"
+      port: 9093
+      targetPort: 9093
   selector:
-    io.kompose.service: monitoring-management-microservice
+    io.kompose.service: kafka
 status:
   loadBalancer: {}

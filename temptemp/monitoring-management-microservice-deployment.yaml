@@ -4,6 +4,7 @@ metadata:
   annotations:
     kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
     kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
   labels:
     io.kompose.service: monitoring-management-microservice
   name: monitoring-management-microservice
@@ -19,13 +20,15 @@ spec:
       annotations:
         kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
         kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
       labels:
         io.kompose.service: monitoring-management-microservice
     spec:
       containers:
-        - command:
-            - python 
-            - main.py
+        - args:
+            - sh
+            - -c
+            - ./wait-for.sh kafka:9092 --timeout 60 -- python main.py
           env:
             - name: CLICKHOUSE_HOST
               valueFrom:
@@ -52,36 +55,11 @@ spec:
                 configMapKeyRef:
                   key: DATABASE_USER
                   name: env
-            - name: MONGO_DB
-              valueFrom:
-                configMapKeyRef:
-                  key: MONGO_DB
-                  name: env
-            - name: MONGO_HOST
-              valueFrom:
-                configMapKeyRef:
-                  key: MONGO_HOST
-                  name: env
-            - name: MONGO_PASSWORD
-              valueFrom:
-                configMapKeyRef:
-                  key: MONGO_PASSWORD
-                  name: env
-            - name: MONGO_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: MONGO_PORT
-                  name: env
-            - name: MONGO_SERVER
-              valueFrom:
-                configMapKeyRef:
-                  key: MONGO_SERVER
-                  name: env
-            - name: MONGO_USER
-              valueFrom:
-                configMapKeyRef:
-                  key: MONGO_USER
-                  name: env
+            - name: DB_HOST
+            - name: DB_NAME
+            - name: DB_PASSWORD
+            - name: DB_PORT
+            - name: DB_USERNAME
             - name: ENVIRONMENT
               valueFrom:
                 configMapKeyRef:
@@ -242,15 +220,14 @@ spec:
                 configMapKeyRef:
                   key: RECORDING_MICROSERVICE_KAFKA_TOPICS
                   name: env
-          image: monitoring-management-microservice:latest 
-          imagePullPolicy: IfNotPresent
+          image: monitoring-management-microservice
           name: monitoring-management-microservice
           ports:
             - containerPort: 8000
-          resources: 
-          # volumeMounts:
-          #   - mountPath: /app/monitoring-management-microservice/
-          #     name: monitoring-management-microservice-claim0
+          resources: {}
+          volumeMounts:
+            - mountPath: /app/monitoring-management-microservice/
+              name: monitoring-management-microservice-claim0
       restartPolicy: Always
       volumes:
         - name: monitoring-management-microservice-claim0

@@ -4,15 +4,16 @@ metadata:
   annotations:
     kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
     kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
   labels:
-    io.kompose.service: monitoring-management-microservice
-  name: monitoring-management-microservice
+    io.kompose.service: postgres
+  name: postgres
 spec:
   ports:
-    - name: "8000"
-      port: 8000
-      targetPort: 8000
+    - name: "5432"
+      port: 5432
+      targetPort: 5432
   selector:
-    io.kompose.service: monitoring-management-microservice
+    io.kompose.service: postgres
 status:
   loadBalancer: {}
