@@ -23,6 +23,7 @@ async def test_ch():
 CH_QUERY_KAFKA_TABLE =  f"""
                             CREATE TABLE IF NOT EXISTS stage.kafka_fact_recording
                             (
+                                record_id             UInt32,
                                 device_id             String,
                                 measure               String,
                                 health                UInt8,
@@ -45,6 +46,7 @@ CH_QUERY_KAFKA_TABLE =  f"""
 CH_QUERY_DWH_TABLE =    f"""
                             CREATE TABLE IF NOT EXISTS dwh.fact_recording
                             (
+                                record_id             UInt32,
                                 device_id             String,
                                 measure               String,
                                 health                UInt8,
@@ -53,7 +55,7 @@ CH_QUERY_DWH_TABLE =    f"""
                                 measure_value         Float64
                             )
                             ENGINE = MergeTree 
-                            ORDER BY (device_id, measure, toYYYYMMDD(timestamp))
+                            ORDER BY (record_id, device_id, measure, toYYYYMMDD(timestamp))
                             ;
                         """
 
@@ -61,14 +63,15 @@ CH_QUERY_DWH_TABLE =    f"""
 CH_QUERY_MV_DWH_TABLE = f"""
                             CREATE MATERIALIZED VIEW IF NOT EXISTS dwh.mv_fact_recording
                             TO dwh.fact_recording
-                            AS SELECT device_id,
+                            AS SELECT record_id,
+                                      device_id,
                                       measure,
                                       health,
                                       toDateTime(timestamp)  AS timestamp,
                                       toUnixTimestamp(now()) AS update_epoch,
                                       measure_value  
                             FROM stage.kafka_fact_recording
-                            GROUP BY device_id, measure, health, timestamp, measure_value
+                            GROUP BY record_id, device_id, measure, health, timestamp, measure_value
                             ;
                         """
 
@@ -293,3 +296,20 @@ async def last_measure_state(measure: str) -> dict:
         row = await client.fetchone(marts_query)
 
         return dict(row)
+
+
+async def remove_entry(recording_id: int):
+    async with ClientSession() as s:
+        client = ChClient(
+            s, 
+            url=settings.DB_URI,
+            compress_response=True
+        )
+        
+        remove_query = f"ALTER TABLE dwh.fact_recording DELETE WHERE record_id = {recording_id};"
+
+        logger.info(f"Removing recording {recording_id} with query: {remove_query}")
+
+        result = await client.execute(remove_query)
+
+        logger.info(f"Result {result}")

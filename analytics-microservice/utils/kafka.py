@@ -5,6 +5,7 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 from utils.config import get_config
 from utils.logger import logger_config
+from db.database import remove_entry
 
 settings = get_config()
 
@@ -32,6 +33,10 @@ async def consume():
                 "payload": json.loads(msg.value)
             }
             logger.info("Consumed " + str(packet["payload"]))
+            if packet["topic"] == "measure_rollback":
+                logger.info(f"Measure rollback: {str(packet)}")
+                recording_id = packet["payload"]["record_id"]
+                await remove_entry(recording_id=recording_id)
     finally:
         await consumer.stop()
 

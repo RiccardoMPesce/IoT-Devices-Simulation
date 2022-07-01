@@ -3,5 +3,6 @@ pydantic
 uvicorn
 starlette_exporter
 starlette
+aiokafka
 aiohttp
 aiochclient

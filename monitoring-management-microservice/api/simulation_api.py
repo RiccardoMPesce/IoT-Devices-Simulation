@@ -38,7 +38,7 @@ async def simulate_recording(device_id: str,
     start = time.time()
     device = await db.device_get_one(device_id=device_id)
 
-    if device and device["status"]:
+    if device:
         measure = {
             "device_id": device_id,
             "measure": device.get("measure"),
