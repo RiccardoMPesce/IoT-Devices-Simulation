@@ -17,7 +17,7 @@ def database_uri():
     DB_PORT = os.getenv("CLICKHOUSE_PORT", "8123")
 
     CLIENT_SETUP = (
-        f"{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        f"clickhouse://{DB_HOST}:{DB_PORT}/{DB_NAME}"
     )
 
     return CLIENT_SETUP

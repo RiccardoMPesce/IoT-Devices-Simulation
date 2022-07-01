@@ -10,6 +10,7 @@ settings = get_config()
 
 
 async def test_ch():
+    logger.info(f"DB URI: {settings.DB_URI}")
     async with ClientSession() as s:
         client = ChClient(
             s, 

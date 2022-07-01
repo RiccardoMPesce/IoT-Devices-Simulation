@@ -30,7 +30,7 @@ app.include_router(endpoint)
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("Testing clickhouse")
+    logger.info(f"Testing clickhouse DB_URI {settings.DB_URI}")
     await test_ch()
     await ch_init()
     asyncio.create_task(consume())
