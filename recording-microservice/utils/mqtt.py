@@ -33,6 +33,7 @@ async def handle_measure(payload: dict):
     )
     await record.save()
     logger.info(f"Payload {payload} saved into database")
+    payload["record_id"] = record.dict()["recording_id"]
     await send_recording(payload)
     logger.info(f"Payload {payload} sent through kafka")
 

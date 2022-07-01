@@ -5,6 +5,7 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 from utils.config import get_config
 from utils.logger import logger_config
+from db.database import Record
 
 settings = get_config()
 
@@ -32,6 +33,8 @@ async def consume():
                 "payload": json.loads(msg.value)
             }
             logger.info("Consumed " + str(packet["payload"]))
+            if packet["topic"] == "measure_rollback":
+                await rollback_recording(packet["payload"]["record_id"])
     finally:
         await consumer.stop()
 
@@ -72,4 +75,8 @@ async def send_command(command: dict):
         await producer.send(topic=kafka_topic, value=payload)
     finally:
         await producer.stop()
+
+async def rollback_recording(recording_id: int):
+    logger.info(f"Recording Microservide: executing rollback {recording_id}")
+    await Record.objects.delete(recording_id=recording_id)
 

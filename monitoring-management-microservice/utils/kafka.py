@@ -38,6 +38,9 @@ async def consume():
             
             if packet["topic"] == "device_commands" and "device_id" in packet["payload"]:
                 await handle_command(packet["payload"])
+            
+            if packet["topic"] == "measure_recordings" and "device_id" in packet["payload"]:
+                await handle_measure(packet["payload"])
     finally:
         await consumer.stop()
 
@@ -72,3 +75,21 @@ async def handle_command(command: dict) -> dict:
     await db.device_update_one(payload)
     new_device = await db.device_get_one(update_dict["device_id"])
     return new_device
+
+
+async def handle_measure(measure: dict) -> dict:
+    device = await db.device_get_one(measure["device_id"])
+    
+    if device["status"] == False:
+        loop = asyncio.get_event_loop()
+
+        producer = AIOKafkaProducer(
+            loop=loop,
+            bootstrap_servers=settings.KAFKA_INSTANCE
+        )
+        await producer.start()
+
+        logger.info(f"Rollback started {str(measure)}")
+        await producer.send("measure_rollback", json.dumps(measure).encode("utf-8"))
+
+        await producer.stop()

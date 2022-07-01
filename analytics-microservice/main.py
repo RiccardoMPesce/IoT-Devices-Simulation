@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from db.database import test_ch, ch_init
 from utils.logger import logger_config
 from utils.config import get_config
+from utils.kafka import consume
 from api.endpoint import endpoint
 
 
@@ -32,6 +33,7 @@ async def startup_event():
     logger.info("Testing clickhouse")
     await test_ch()
     await ch_init()
+    asyncio.create_task(consume())
         
 @app.on_event("shutdown")
 async def shutdown_event():

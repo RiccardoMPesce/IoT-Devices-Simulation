@@ -22,7 +22,7 @@ services:
       - 9093
     environment:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CREATE_TOPICS="test:1:1,measure_recordings:1:1,device_commands:1:1,sensor_metrics:1:1"
+      - KAFKA_CREATE_TOPICS="test:1:1,measure_recordings:1:1,device_commands:1:1,sensor_metrics:1:1,measure_rollback:1:1"
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
       - KAFKA_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
       - KAFKA_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
@@ -35,19 +35,19 @@ services:
     restart: always
     volumes:
       - ./data/kafka:/data/kafka
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    container_name: kafdrop
-    # volumes:
-    #   - ./data/kafka/data:/var/lib/kafka/data
-    depends_on: 
-      - kafka
-    ports:
-      - 9000:9000
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:9092"
-      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
-    restart: always
+  # kafdrop:
+  #   image: obsidiandynamics/kafdrop
+  #   container_name: kafdrop
+  #   # volumes:
+  #   #   - ./data/kafka/data:/var/lib/kafka/data
+  #   depends_on: 
+  #     - kafka
+  #   ports:
+  #     - 9000:9000
+  #   environment:
+  #     KAFKA_BROKERCONNECT: "kafka:9092"
+  #     JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+  #   restart: always
   mongodb:
     image: mongo
     container_name: mongodb
@@ -76,24 +76,24 @@ services:
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - POSTGRES_DB=recordings
     env_file: .env
-  mongo-express:
-    container_name: mongo-express
-    image: mongo-express
-    restart: always
-    depends_on:
-      - mongodb
-    environment:
-      - ME_CONFIG_MONGODB_SERVER=$MONGO_HOST
-      - ME_CONFIG_MONGODB_PORT=$MONGO_PORT
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=$MONGO_USER
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=$MONGO_PASSWORD
-      - ME_CONFIG_BASICAUTH_USERNAME=$MONGO_USER
-      - ME_CONFIG_BASICAUTH_PASSWORD=$MONGO_PASSWORD
-    env_file: .env
-    ports:
-      - 8081:8081
-    volumes: 
-      - ./data/mongodb/:/data/db/
+  # mongo-express:
+  #   container_name: mongo-express
+  #   image: mongo-express
+  #   restart: always
+  #   depends_on:
+  #     - mongodb
+  #   environment:
+  #     - ME_CONFIG_MONGODB_SERVER=$MONGO_HOST
+  #     - ME_CONFIG_MONGODB_PORT=$MONGO_PORT
+  #     - ME_CONFIG_MONGODB_ADMINUSERNAME=$MONGO_USER
+  #     - ME_CONFIG_MONGODB_ADMINPASSWORD=$MONGO_PASSWORD
+  #     - ME_CONFIG_BASICAUTH_USERNAME=$MONGO_USER
+  #     - ME_CONFIG_BASICAUTH_PASSWORD=$MONGO_PASSWORD
+  #   env_file: .env
+  #   ports:
+  #     - 8081:8081
+  #   volumes: 
+  #     - ./data/mongodb/:/data/db/
   monitoring-management-microservice:
     build: 
       context: ./monitoring-management-microservice
