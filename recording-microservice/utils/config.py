@@ -10,17 +10,17 @@ def database_uri():
     """
     DB connection details
     """
-    DB_USER = os.getenv("POSTGRES_USERNAME", "admin")
-    DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "ds&bd2021-2022")
-    DB_NAME = os.getenv("POSTGRES_DB", "recordings")
-    DB_HOST = os.getenv("POSTGRES_HOST", "postgres")
-    DB_PORT = os.getenv("POSTGRES_PORT", "5432")
+    POSTGRES_USERNAME = os.getenv("POSTGRES_USERNAME", "admin")
+    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "ds&bd2021-2022")
+    POSTGRES_DB = os.getenv("POSTGRES_DB", "recordings")
+    POSTGRES_HOST = os.getenv("POSTGRES_HOST", "postgres")
+    POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
 
-    MONGODB_CLIENT_SETUP = (
-        f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    DB_CLIENT_SETUP = (
+        f"postgresql://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     )
 
-    return MONGODB_CLIENT_SETUP
+    return DB_CLIENT_SETUP
 
 
 class Settings(BaseSettings):
