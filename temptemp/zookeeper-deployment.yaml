@@ -4,14 +4,15 @@ metadata:
   annotations:
     kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
     kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
   labels:
-    io.kompose.service: clickhouse
-  name: clickhouse
+    io.kompose.service: zookeeper
+  name: zookeeper
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: clickhouse
+      io.kompose.service: zookeeper
   strategy:
     type: Recreate
   template:
@@ -19,22 +20,26 @@ spec:
       annotations:
         kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
         kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
       labels:
-        io.kompose.service: clickhouse
+        io.kompose.service: zookeeper
     spec:
       containers:
-        - image: yandex/clickhouse-server
-          name: clickhouse
+        - env:
+            - name: ALLOW_ANONYMOUS_LOGIN
+              value: "yes"
+          image: bitnami/zookeeper
+          name: zookeeper
           ports:
-            - containerPort: 8123
-          resources: 
+            - containerPort: 2181
+          resources: {}
           volumeMounts:
-            - mountPath: /var/lib/clickhouse
-              name: clickhouse-claim0
-      hostname: clickhouse
+            - mountPath: /data/zookeeper
+              name: zookeeper-claim0
+      hostname: zookeeper
       restartPolicy: Always
       volumes:
-        - name: clickhouse-claim0
+        - name: zookeeper-claim0
           persistentVolumeClaim:
-            claimName: clickhouse-claim0
+            claimName: zookeeper-claim0
 status: {}

@@ -4,6 +4,7 @@ metadata:
   annotations:
     kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
     kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
   labels:
     io.kompose.service: clickhouse
   name: clickhouse
@@ -19,6 +20,7 @@ spec:
       annotations:
         kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
         kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
       labels:
         io.kompose.service: clickhouse
     spec:
@@ -27,7 +29,7 @@ spec:
           name: clickhouse
           ports:
             - containerPort: 8123
-          resources: 
+          resources: {}
           volumeMounts:
             - mountPath: /var/lib/clickhouse
               name: clickhouse-claim0

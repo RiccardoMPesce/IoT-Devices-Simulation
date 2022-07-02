@@ -4,14 +4,15 @@ metadata:
   annotations:
     kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
     kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
   labels:
-    io.kompose.service: analytics-microservice
-  name: analytics-microservice
+    io.kompose.service: postgres
+  name: postgres
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: analytics-microservice
+      io.kompose.service: postgres
   strategy:
     type: Recreate
   template:
@@ -19,14 +20,12 @@ spec:
       annotations:
         kompose.cmd: kompose convert -f docker-compose.yml -o temptemp/
         kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
       labels:
-        io.kompose.service: analytics-microservice
+        io.kompose.service: postgres
     spec:
       containers:
-        - args:
-            - python
-            - main.py
-          env:
+        - env:
             - name: CLICKHOUSE_HOST
               valueFrom:
                 configMapKeyRef:
@@ -167,6 +166,7 @@ spec:
                 configMapKeyRef:
                   key: POSTGRES_PORT
                   name: env
+            - name: POSTGRES_USER
             - name: POSTGRES_USERNAME
               valueFrom:
                 configMapKeyRef:
@@ -212,18 +212,17 @@ spec:
                 configMapKeyRef:
                   key: RECORDING_MICROSERVICE_KAFKA_TOPICS
                   name: env
-          image: analytics-microservice:latest
-          imagePullPolicy: IfNotPresent
-          name: analytics-microservice
+          image: postgres
+          name: postgres
           ports:
-            - containerPort: 8002
-          resources: 
-          # volumeMounts:
-          #   - mountPath: /app/analytics-microservice/
-          #     name: analytics-microservice-claim0
+            - containerPort: 5432
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/postgres/
+              name: postgres-claim0
       restartPolicy: Always
       volumes:
-        - name: analytics-microservice-claim0
+        - name: postgres-claim0
           persistentVolumeClaim:
-            claimName: analytics-microservice-claim0
+            claimName: postgres-claim0
 status: {}

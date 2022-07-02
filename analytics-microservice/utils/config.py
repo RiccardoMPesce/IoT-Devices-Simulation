@@ -14,7 +14,7 @@ def database_uri():
     # DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "ds&bd2021-2022")
     DB_NAME = os.getenv("CLICKHOUSE_DB", "default")
     DB_HOST = os.getenv("CLICKHOUSE_HOST", "clickhouse")
-    DB_PORT = os.getenv("CLICKHOUSE_PORT", "8123")
+    DB_PORT = os.getenv("CLICKHOUSE_PORT_HTTP", "8123")
 
     CLIENT_SETUP = (
         f"clickhouse://{DB_HOST}:{DB_PORT}/{DB_NAME}"
