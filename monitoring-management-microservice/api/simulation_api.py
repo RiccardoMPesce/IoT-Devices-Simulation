@@ -4,7 +4,7 @@ import time
 from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
 from typing import Union
-from prometheus_client import Counter, Histogram, Summary, CollectorRegistry, push_to_gateway
+from prometheus_client import Counter, Gauge, Summary, CollectorRegistry, push_to_gateway
 from datetime import datetime
 
 from db.common import get_database, DatabaseManager
@@ -20,6 +20,7 @@ router = APIRouter(prefix="/simulate")
 
 registry = CollectorRegistry()
 
+recorded_value = Gauge("recorded_value", "Value recorded", ["device_id", "measure"], registry=registry)
 counter = Counter("records", "Sensor records", ["device_id"], registry=registry)
 summary = Summary("summary", "Sensor latency", ["device_id"], registry=registry)
 
@@ -55,6 +56,7 @@ async def simulate_recording(device_id: str,
         end = time.time()
         counter.labels(device_id=device_id).inc()
         summary.labels(device_id=device_id).observe(end - start)
+        recorded_value.labels(device_id=device_id, measure=device.get("measure")).set(float(measure_value))
         push_to_gateway(settings.PUSHGATEWAY_INSTANCE, job="pushgateway", registry=registry)
         
         return JSONResponse(status_code=status.HTTP_201_CREATED, content="Measure " + str(measure) + " pushed to topic " + topic)
