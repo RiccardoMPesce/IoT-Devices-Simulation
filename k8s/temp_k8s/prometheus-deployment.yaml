@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-conf
+data:
+  prometheus.yml: |-
+    # global:
+    #   scrape_interval:     15s
+    #   evaluation_interval: 30s
+    #   # scrape_timeout is set to the global default (10s).
+
+    # scrape_configs:
+    # - job_name: pushgateway
+    #   scrape_interval: 5s
+    #   honor_labels: true
+    #   static_configs:
+    #     - targets: ['pushgateway:9091']
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datasource-conf
+data:
+  datasource.yml: |-
+    # # config file version
+    # apiVersion: 1
+    # # list of datasources that should be deleted from the database
+    # deleteDatasources:
+    #   - name: Prometheus
+    #     orgId: 1
+    # # list of datasources to insert/update depending
+    # # whats available in the database
+    # datasources:
+    #   # <string, required> name of the datasource. Required
+    #   - name: Prometheus
+    #     # <string, required> datasource type. Required
+    #     type: prometheus
+    #     # <string, required> access mode. direct or proxy. Required
+    #     access: proxy
+    #     # <int> org id. will default to orgId 1 if not specified
+    #     orgId: 1
+    #     # <string> url
+    #     url: http://prometheus:9090
+    #     # <string> database password, if used
+    #     password:
+    #     # <string> database user, if used
+    #     user:
+    #     # <string> database name, if used
+    #     database:
+    #     # <bool> enable/disable basic auth
+    #     basicAuth: false
+    #     # <string> basic auth username, if used
+    #     basicAuthUser:
+    #     # <string> basic auth password, if used
+    #     basicAuthPassword:
+    #     # <bool> enable/disable with credentials headers
+    #     withCredentials:
+    #     # <bool> mark as default datasource. Max one per org
+    #     isDefault: true
+    #     # <map> fields that will be converted to json and stored in json_data
+    #     jsonData:
+    #       graphiteVersion: "1.1"
+    #       tlsAuth: false
+    #       tlsAuthWithCACert: false
+    #     # <string> json object of data that will be encrypted.
+    #     secureJsonData:
+    #       tlsCACert: "..."
+    #       tlsClientCert: "..."
+    #       tlsClientKey: "..."
+    #     version: 1
+    #     # <bool> allow users to edit datasources from the UI.
+    #     editable: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
+    kompose.version: 1.26.1 (HEAD)
+  labels:
+    io.kompose.service: prometheus
+  name: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: prometheus
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -o temp_k8s
+        kompose.version: 1.26.1 (HEAD)
+      labels:
+        io.kompose.service: prometheus
+    spec:
+      containers:
+        - image: bitnami/prometheus
+          name: prometheus
+          ports:
+            - containerPort: 9090
+          resources: 
+          # volumeMounts:
+          #   - mountPath: /etc/prometheus/prometheus.yml
+          #     name: prometheus-claim0
+          #   - mountPath: /etc/prometheus
+          #     name: prometheus-claim1
+      restartPolicy: Always
+      volumes:
+        - name: mosquitto-config
+          configMap:
+            name: mosquitto-config
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config
+        - name: prometheus-claim0
+          persistentVolumeClaim:
+            claimName: prometheus-claim0
+        - name: prometheus-claim1
+          persistentVolumeClaim:
+            claimName: prometheus-claim1
+status: {}
